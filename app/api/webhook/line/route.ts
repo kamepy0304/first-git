@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { supabase, getTodayJST, getDifficultyLevel, setDifficultyLevel } from '@/lib/supabase'

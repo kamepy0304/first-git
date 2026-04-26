@@ -9,8 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "14.2.3",
     "@supabase/supabase-js": "^2.43.1",
+    "next": "^14.2.35",
     "openai": "^4.47.1"
   },
   "devDependencies": {
