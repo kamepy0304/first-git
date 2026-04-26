@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase, getTodayJST } from '@/lib/supabase'
 import { pushMessage, buildEveningMessage } from '@/lib/line'
