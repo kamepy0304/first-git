@@ -1,0 +1,17 @@
+{
+  "openai_api_key": "YOUR_API_KEY_HERE",
+  "model": "gpt-4o-mini",
+  "hiroshi_status": {
+    "morning_wakeup_streak": 0,
+    "wakeup_time_target": "04:00",
+    "big3_total_kg": 320,
+    "big3_target_kg": 350,
+    "squat_kg": 110,
+    "bench_kg": 90,
+    "deadlift_kg": 120,
+    "golf_avg_score": 102,
+    "golf_target_score": 95,
+    "wine_expert_level": "WSET Level 3",
+    "last_updated": "2026-04-26"
+  }
+}
