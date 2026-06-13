@@ -42,3 +42,11 @@ CREATE OR REPLACE TRIGGER cockpit_calendar_updated_at
 
 -- インデックス（作成日時降順で高速フェッチ）
 CREATE INDEX IF NOT EXISTS idx_cockpit_bucket_created ON cockpit_bucket_items (created_at DESC);
+
+-- ==========================================
+-- Notion同期用カラム追加（初回スキーマ作成後に実行）
+-- ==========================================
+ALTER TABLE cockpit_bucket_items
+  ADD COLUMN IF NOT EXISTS notion_page_id TEXT UNIQUE;
+
+CREATE INDEX IF NOT EXISTS idx_cockpit_bucket_notion ON cockpit_bucket_items (notion_page_id);

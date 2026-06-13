@@ -330,6 +330,20 @@
                                     </div>
                                 </div>
                                 <div>
+                                    <label class="block text-[10px] font-bold text-app-textMuted mb-1">
+                                        Notion データベース ID
+                                        <span class="ml-1 text-app-textMuted font-normal">（NotionのURLの末尾32文字）</span>
+                                    </label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-app-textMuted"><i class="fa-brands fa-notion"></i></span>
+                                        <input type="text" id="input-notion-db-id" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                                               class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-app-border rounded-lg focus:outline-none focus:border-app-accent font-mono">
+                                    </div>
+                                    <p class="text-[9px] text-app-textMuted mt-1">
+                                        Notion でデータベースを開き、URLの <code class="bg-gray-100 px-1 rounded">notion.so/...</code> 末尾の32文字を貼り付けてください。
+                                    </p>
+                                </div>
+                                <div>
                                     <label class="block text-[10px] font-bold text-app-textMuted mb-1">Gemini APIキー（任意: 本物のAIコンボ生成）</label>
                                     <div class="relative">
                                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-app-textMuted"><i class="fa-solid fa-microchip"></i></span>
@@ -625,7 +639,7 @@
     }
 
     async function simulateNotionSync() {
-        const btn     = document.getElementById('sync-button');
+        const btn      = document.getElementById('sync-button');
         const syncIcon = document.getElementById('sync-icon');
         const timeline = document.getElementById('bucket-timeline-container');
         btn.disabled = true;
@@ -633,15 +647,38 @@
         syncIcon.classList.add('fa-spin', 'text-app-accent');
         timeline.classList.add('notion-sync-rattle');
 
-        const today = new Date().toISOString().split('T')[0];
-        await DB.syncDates(today);
+        const notionToken      = localStorage.getItem('notion_token');
+        const notionDatabaseId = localStorage.getItem('notion_database_id');
+
+        if (notionToken && notionDatabaseId) {
+            // 本物の Notion 同期
+            try {
+                const res = await fetch('/api/cockpit/notion-sync', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ notionToken, notionDatabaseId }),
+                }).then(r => r.json());
+
+                if (res.error) throw new Error(res.error);
+
+                // DB キャッシュを再取得して再描画
+                await DB.init();
+                renderTimelineBucketList();
+                updateMetrics();
+                showToast(`Notion「タイムバケット」から ${res.synced} 件を同期しました！`);
+            } catch (e) {
+                showToast(`Notion同期エラー: ${e.message}`, false);
+            }
+        } else {
+            // トークン未設定 → 設定画面に誘導
+            showToast('設定タブで Notion トークンとデータベース ID を入力してください。', false);
+            setTimeout(() => switchSubTab('notion-config'), 1500);
+        }
 
         btn.disabled = false;
         document.getElementById('sync-btn-text').innerText = 'Notionと同期';
         syncIcon.classList.remove('fa-spin', 'text-app-accent');
         timeline.classList.remove('notion-sync-rattle');
-        renderTimelineBucketList();
-        showToast('Notion データベースとの双方向同期が完了しました！');
     }
 
     function gainXP(amount) {
@@ -1168,14 +1205,22 @@
     }
 
     function saveConfiguration() {
-        const notionToken = document.getElementById('input-notion-token').value.trim();
-        const geminiKey   = document.getElementById('input-gemini-key').value.trim();
-        notionToken ? localStorage.setItem('notion_token', notionToken) : localStorage.removeItem('notion_token');
-        geminiKey   ? localStorage.setItem('gemini_api_key', geminiKey)   : localStorage.removeItem('gemini_api_key');
-        document.getElementById('notion-api-status').className = notionToken
+        const notionToken  = document.getElementById('input-notion-token').value.trim();
+        const notionDbId   = document.getElementById('input-notion-db-id').value.trim();
+        const geminiKey    = document.getElementById('input-gemini-key').value.trim();
+
+        notionToken ? localStorage.setItem('notion_token',       notionToken) : localStorage.removeItem('notion_token');
+        notionDbId  ? localStorage.setItem('notion_database_id', notionDbId)  : localStorage.removeItem('notion_database_id');
+        geminiKey   ? localStorage.setItem('gemini_api_key',     geminiKey)   : localStorage.removeItem('gemini_api_key');
+
+        const bothNotion = notionToken && notionDbId;
+        document.getElementById('notion-api-status').className = bothNotion
             ? 'w-2 h-2 rounded-full bg-emerald-500 pulse-indicator'
             : 'w-2 h-2 rounded-full bg-red-400';
-        showToast('設定を保存しました。');
+
+        showToast(bothNotion
+            ? '設定を保存しました。「Notionと同期」ボタンで同期できます！'
+            : '設定を保存しました。');
         renderAIPanel();
     }
 
@@ -1225,12 +1270,14 @@
     // ==========================================
     window.onload = async function () {
         // localStorage からAPIキーを復元
-        if (localStorage.getItem('notion_token')) {
-            document.getElementById('input-notion-token').value = localStorage.getItem('notion_token');
+        const savedToken  = localStorage.getItem('notion_token');
+        const savedDbId   = localStorage.getItem('notion_database_id');
+        const savedGemini = localStorage.getItem('gemini_api_key');
+        if (savedToken)  document.getElementById('input-notion-token').value  = savedToken;
+        if (savedDbId)   document.getElementById('input-notion-db-id').value  = savedDbId;
+        if (savedGemini) document.getElementById('input-gemini-key').value    = savedGemini;
+        if (savedToken && savedDbId) {
             document.getElementById('notion-api-status').className = 'w-2 h-2 rounded-full bg-emerald-500 pulse-indicator';
-        }
-        if (localStorage.getItem('gemini_api_key')) {
-            document.getElementById('input-gemini-key').value = localStorage.getItem('gemini_api_key');
         }
         // XP
         if (localStorage.getItem('cockpit_user_xp')) {
