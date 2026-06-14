@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>体験創造 COCKPIT - 究極版</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Noto Sans JP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Canvas Confetti Library for level up / completion effects -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
+                    },
+                    colors: {
+                        app: {
+                            bg: '#F4F3EF',
+                            sidebar: '#F9F8F6',
+                            border: '#E3E1D9',
+                            textMain: '#2C2B29',
+                            textMuted: '#8E8C84',
+                            accent: '#C27D38',
+                            accentHover: '#A86628',
+                            activeBg: '#EAE8E2',
+                            notion: '#37352F'
+                        }
+                    },
+                    boxShadow: {
+                        'subtle': '0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04)',
+                        'premium': '0 4px 20px -2px rgba(194, 125, 56, 0.08), 0 2px 6px -1px rgba(0,0,0,0.04)',
+                        'lifted': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #D8D6CE; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #C27D38; }
+
+        .smooth-transition { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+
+        .interactive-card { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        .interactive-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(194, 125, 56, 0.06); }
+        .interactive-card:active { transform: translateY(1px); }
+
+        @keyframes rattle {
+            0%   { transform: translate(0, 0) rotate(0deg); }
+            20%  { transform: translate(-1px, 1px) rotate(-0.5deg); }
+            40%  { transform: translate(1px, -1px) rotate(0.5deg); }
+            60%  { transform: translate(-1px, -1px) rotate(-0.5deg); }
+            80%  { transform: translate(1px, 1px) rotate(0.5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        .notion-sync-rattle { animation: rattle 0.4s ease-in-out infinite; }
+
+        @keyframes pulse-light {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        .pulse-indicator { animation: pulse-light 1.5s infinite; }
+
+        /* バケットタイムラインのノード */
+        .timeline-node {
+            width: 22px;
+            height: 22px;
+        }
+
+        /* モーダルオーバーレイ */
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-app-bg font-sans text-app-textMain antialiased h-screen overflow-hidden flex flex-col smooth-transition">
+
+    <div class="flex flex-1 overflow-hidden h-full">
+
+        <!-- ==========================================
+             1. 左サイドバー
+             ========================================== -->
+        <aside class="w-64 bg-app-sidebar border-r border-app-border flex flex-col justify-between shrink-0 select-none z-20">
+            <div class="p-5">
+                <!-- ロゴ -->
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-9 h-9 bg-app-accent rounded-xl flex items-center justify-center text-white font-bold shadow-md">
+                        <i class="fa-solid fa-compass-drafting text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-sm tracking-wider text-gray-800">体験創造コックピット</h1>
+                        <p class="text-[10px] text-app-textMuted font-mono">ULTIMATE EDITION</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between items-center text-[10px] font-bold text-app-textMuted tracking-wider mb-2 uppercase">
+                            <span>企画・探求</span>
+                            <span class="pulse-indicator w-2 h-2 rounded-full bg-emerald-500"></span>
+                        </div>
+                        <nav class="space-y-1">
+                            <a href="#" onclick="switchSubTab('dashboard'); return false;" id="nav-dashboard" class="flex justify-between items-center px-3 py-2.5 text-xs font-semibold bg-app-activeBg text-app-accent rounded-lg smooth-transition">
+                                <span class="flex items-center gap-2.5">
+                                    <i class="fa-regular fa-calendar-days text-app-accent text-sm"></i>
+                                    <span>週末の空き枠を探す</span>
+                                </span>
+                                <span class="text-[10px] bg-amber-100 text-app-accent px-1.5 py-0.5 rounded-full font-mono font-bold" id="slot-count-badge">5</span>
+                            </a>
+                            <a href="#" onclick="switchSubTab('notion-config'); return false;" id="nav-notion" class="flex justify-between items-center px-3 py-2.5 text-xs font-medium text-app-textMuted hover:bg-gray-100 rounded-lg smooth-transition">
+                                <span class="flex items-center gap-2.5">
+                                    <i class="fa-solid fa-link text-gray-400 text-sm"></i>
+                                    <span>Notion同期 / 設定</span>
+                                </span>
+                                <span id="notion-api-status" class="w-2 h-2 rounded-full bg-red-400"></span>
+                            </a>
+                        </nav>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center text-[10px] font-bold text-app-textMuted tracking-wider mb-2 uppercase">
+                            <span>実績・ログ</span>
+                        </div>
+                        <nav class="space-y-1">
+                            <a href="#" onclick="switchSubTab('achievements'); return false;" id="nav-achievements" class="flex justify-between items-center px-3 py-2.5 text-xs font-medium text-app-textMuted hover:bg-gray-100 rounded-lg smooth-transition">
+                                <span class="flex items-center gap-2.5">
+                                    <i class="fa-solid fa-trophy text-gray-400 text-sm"></i>
+                                    <span>達成した新しい体験</span>
+                                </span>
+                                <span class="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full font-mono" id="completed-count-badge">1</span>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- フッタープロファイル -->
+            <div class="p-4 border-t border-app-border bg-white/60">
+                <div class="flex items-center gap-3 mb-2.5">
+                    <div class="relative">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-600 to-amber-300 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                            ひ
+                        </div>
+                        <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-app-accent text-white rounded-full flex items-center justify-center text-[8px] font-bold border border-white">Lv</span>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <div class="flex justify-between items-center">
+                            <p class="text-xs font-bold text-gray-800">ひろし</p>
+                            <span class="text-[10px] text-app-accent font-bold" id="user-level-badge">Lv.1</span>
+                        </div>
+                        <p class="text-[9px] text-app-textMuted truncate">コンフォートゾーン突破中</p>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center text-[8px] text-app-textMuted">
+                        <span>体験XP: <strong id="xp-text">1400 / 2000</strong></span>
+                        <span id="xp-percent">70%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                        <div id="xp-bar" class="bg-app-accent h-full smooth-transition" style="width: 70%"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ==========================================
+             メインコンテンツエリア
+             ========================================== -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+
+            <!-- ヘッダー -->
+            <header class="bg-white border-b border-app-border px-6 py-4 flex justify-between items-center shrink-0 z-10 shadow-sm">
+                <div class="flex items-center gap-2 text-xs text-app-textMuted">
+                    <span>体験管理コックピット</span>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-gray-300"></i>
+                    <span class="text-gray-800 font-semibold" id="header-selected-date">6月6日 (土) の計画</span>
+                </div>
+                <div class="flex items-center gap-5">
+                    <button onclick="resetCockpit()" class="text-xs text-app-accent hover:text-amber-800 flex items-center gap-1.5 font-medium transition-colors">
+                        <i class="fa-solid fa-rotate-left text-[11px]"></i> 初期データに戻す
+                    </button>
+                    <div class="h-4 w-[1px] bg-app-border"></div>
+                    <i class="fa-solid fa-sliders text-app-textMuted hover:text-gray-800 cursor-pointer smooth-transition" title="コンフォートゾーン設定" onclick="switchSubTab('notion-config')"></i>
+                </div>
+            </header>
+
+            <div id="main-tab-content" class="flex-1 flex overflow-hidden">
+
+                <!-- ==========================================
+                     A. ダッシュボード（4ペインレイアウト）
+                     ========================================== -->
+                <div id="tab-dashboard" class="flex-grow flex overflow-hidden w-full">
+
+                    <!-- Pane 1: カレンダー空き枠リスト -->
+                    <section class="w-72 bg-app-sidebar border-r border-app-border flex flex-col shrink-0 select-none">
+                        <div class="p-4 border-b border-app-border shrink-0 bg-white/40">
+                            <h2 class="text-xs font-bold text-gray-800 flex items-center justify-between tracking-wider uppercase">
+                                <span>土日の空き枠チェッカー</span>
+                                <span class="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-full font-semibold">直近1ヶ月</span>
+                            </h2>
+                            <p class="text-[10px] text-app-textMuted mt-1 leading-normal">空いている日をクリックして、中央のバケットや右のAI提案とシームレスに連動します。</p>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-3 space-y-2.5" id="slot-list-container"></div>
+                    </section>
+
+                    <!-- Pane 2: 新体験計画 & バケットリスト -->
+                    <section class="flex-grow bg-white flex flex-col overflow-hidden border-r border-app-border">
+                        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+
+                            <!-- アクティブ計画カード -->
+                            <div class="bg-app-sidebar/40 border border-app-border rounded-2xl p-5 smooth-transition shadow-subtle" id="active-plan-card"></div>
+
+                            <!-- メトリクスバッジ -->
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="bg-white border border-app-border rounded-xl p-3 flex items-center justify-between shadow-subtle">
+                                    <div class="space-y-0.5">
+                                        <span class="text-[10px] font-bold text-app-textMuted block">Notion ストック</span>
+                                        <span class="text-lg font-bold text-app-notion" id="metric-stock">4</span>
+                                    </div>
+                                    <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                        <i class="fa-brands fa-notion"></i>
+                                    </div>
+                                </div>
+                                <div class="bg-white border border-app-border rounded-xl p-3 flex items-center justify-between shadow-subtle">
+                                    <div class="space-y-0.5">
+                                        <span class="text-[10px] font-bold text-app-textMuted block">今月のアサイン中</span>
+                                        <span class="text-lg font-bold text-app-accent" id="metric-assigned">2</span>
+                                    </div>
+                                    <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center text-app-accent">
+                                        <i class="fa-solid fa-calendar-check"></i>
+                                    </div>
+                                </div>
+                                <div class="bg-white border border-app-border rounded-xl p-3 flex items-center justify-between shadow-subtle">
+                                    <div class="space-y-0.5">
+                                        <span class="text-[10px] font-bold text-app-textMuted block">突破した体験</span>
+                                        <span class="text-lg font-bold text-emerald-600" id="metric-completed">12</span>
+                                    </div>
+                                    <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                        <i class="fa-solid fa-award"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Notionバケットリスト -->
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center border-b border-app-border pb-2.5">
+                                    <h3 class="text-xs font-bold text-gray-800 flex items-center gap-2 tracking-wider uppercase">
+                                        <i class="fa-brands fa-notion text-app-notion"></i>
+                                        <span>Notion同期 バケットリスト (過去ストック)</span>
+                                    </h3>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="simulateNotionSync()" id="sync-button" class="text-[11px] border border-app-border hover:border-app-accent bg-white text-gray-700 px-3 py-1.5 rounded-lg smooth-transition flex items-center gap-1.5">
+                                            <i class="fa-solid fa-arrows-rotate" id="sync-icon"></i> <span id="sync-btn-text">Notionと同期</span>
+                                        </button>
+                                        <button onclick="toggleAddBucketForm()" class="text-[11px] bg-app-accent text-white px-3 py-1.5 rounded-lg hover:bg-app-accentHover smooth-transition flex items-center gap-1">
+                                            <i class="fa-solid fa-plus"></i> 追加
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- バケット追加フォーム -->
+                                <div id="add-bucket-form" class="hidden bg-app-sidebar/50 p-4 rounded-xl border border-app-border flex-col gap-3 smooth-transition">
+                                    <div class="grid grid-cols-3 gap-3">
+                                        <input type="text" id="new-item-text" placeholder="未体験の挑戦を追加 (例: 吹きガラスコップ作り)..." class="col-span-2 px-3 py-2 text-xs bg-white border border-app-border rounded-lg focus:outline-none focus:border-app-accent">
+                                        <select id="new-item-tag" class="px-2 py-2 text-xs bg-white border border-app-border rounded-lg focus:outline-none focus:border-app-accent">
+                                            <option value="インドア">インドア</option>
+                                            <option value="アウトドア">アウトドア</option>
+                                            <option value="極上体験">極上体験</option>
+                                        </select>
+                                    </div>
+                                    <textarea id="new-item-note" placeholder="体験の狙い・備考を入力..." class="w-full px-3 py-2 text-xs bg-white border border-app-border rounded-lg h-16 focus:outline-none focus:border-app-accent resize-none"></textarea>
+                                    <div class="flex justify-end gap-2">
+                                        <button onclick="closeAddBucketForm()" class="px-3 py-1.5 bg-gray-200 text-gray-600 text-[11px] rounded-lg hover:bg-gray-300 transition-colors">キャンセル</button>
+                                        <button onclick="saveNewBucketItem()" class="px-4 py-1.5 bg-app-accent text-white text-[11px] font-bold rounded-lg hover:bg-app-accentHover transition-colors">Notionに追加</button>
+                                    </div>
+                                </div>
+
+                                <!-- タイムラインバケットリスト -->
+                                <div class="relative pl-6 space-y-4" id="bucket-timeline-container"></div>
+                            </div>
+
+                        </div>
+                    </section>
+
+                    <!-- Pane 3 & 4: AI提案 & リアルイベント -->
+                    <section class="w-80 bg-white flex flex-col shrink-0 overflow-y-auto border-l border-app-border divide-y divide-app-border">
+
+                        <!-- Pane 4: AI掛け算コンボ提案 -->
+                        <div class="p-5 space-y-4 select-none">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-[10px] font-bold text-app-textMuted tracking-wider uppercase">AI掛け算コンボ提案 (Pane 4)</h3>
+                                <div class="flex bg-gray-100 p-0.5 rounded-lg text-[9px] font-semibold">
+                                    <button onclick="changeDifficulty('easy')" id="diff-easy" class="px-2.5 py-1 rounded-md smooth-transition text-app-textMuted">Easy</button>
+                                    <button onclick="changeDifficulty('medium')" id="diff-medium" class="px-2.5 py-1 rounded-md bg-white text-gray-800 shadow-sm smooth-transition font-bold">Medium</button>
+                                    <button onclick="changeDifficulty('hard')" id="diff-hard" class="px-2.5 py-1 rounded-md smooth-transition text-app-textMuted">Hard</button>
+                                </div>
+                            </div>
+                            <div class="bg-amber-50/40 border border-amber-100/60 rounded-2xl p-4 space-y-4 relative" id="ai-proposal-box"></div>
+                        </div>
+
+                        <!-- Pane 3: 周辺リアルイベント情報 -->
+                        <div class="p-5 space-y-4">
+                            <div class="flex justify-between items-center select-none">
+                                <h3 class="text-[10px] font-bold text-app-textMuted tracking-wider uppercase">周辺リアルイベント情報 (Pane 3)</h3>
+                                <span class="text-[9px] font-mono text-app-accent bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 font-bold uppercase">Web Radar</span>
+                            </div>
+                            <div class="space-y-3" id="event-feed-container"></div>
+                        </div>
+
+                    </section>
+
+                </div>
+
+                <!-- ==========================================
+                     B. Notion同期 / 設定
+                     ========================================== -->
+                <div id="tab-notion-config" class="hidden flex-grow flex overflow-y-auto bg-white p-8 w-full">
+                    <div class="max-w-2xl mx-auto w-full space-y-8 text-left">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+                                <i class="fa-brands fa-notion text-app-notion"></i>
+                                <span>Notion API ＆ 設定管理</span>
+                            </h2>
+                            <p class="text-xs text-app-textMuted leading-relaxed">
+                                このコックピットはNotionとシームレスに双方向通信します。また、本物のGemini APIキーを設定することで、カレンダーとバケットリストから究極にパーソナライズされた体験の組み合わせを生成できます。
+                            </p>
+                        </div>
+
+                        <div class="bg-app-sidebar border border-app-border rounded-xl p-5 space-y-4 shadow-subtle">
+                            <h3 class="text-xs font-bold text-gray-700 tracking-wider uppercase">API 接続キー</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-app-textMuted mb-1">Notion インテグレーション・トークン</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-app-textMuted"><i class="fa-solid fa-key"></i></span>
+                                        <input type="password" id="input-notion-token" placeholder="secret_xxxxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-app-border rounded-lg focus:outline-none focus:border-app-accent">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-app-textMuted mb-1">Gemini APIキー（任意: 本物のAIで究極のコンボ生成を行う場合）</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-app-textMuted"><i class="fa-solid fa-microchip"></i></span>
+                                        <input type="password" id="input-gemini-key" placeholder="AIキーを入力すると、完全リアルタイムの掛け算提案が有効になります" class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-app-border rounded-lg focus:outline-none focus:border-app-accent">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- コンフォートゾーン設定 -->
+                        <div class="bg-app-sidebar border border-app-border rounded-xl p-5 space-y-4 shadow-subtle">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-xs font-bold text-gray-700 tracking-wider uppercase">ひろしさんのコンフォートゾーン（既存の趣味）</h3>
+                                <button onclick="resetComfortZones()" class="text-[10px] text-app-accent hover:underline">デフォルトに戻す</button>
+                            </div>
+                            <p class="text-[10px] text-app-textMuted leading-normal">
+                                ここに登録された活動から遠い体験プランほど、AIが「コンフォートゾーン突破度（星評価★）」を高く評価します。
+                            </p>
+                            <div class="flex flex-wrap gap-2" id="comfort-zone-tags-container"></div>
+                            <div class="flex gap-2">
+                                <input type="text" id="new-comfort-tag" placeholder="新しい既存の趣味を登録 (例: キャンプ, 映画鑑賞)..." class="flex-grow px-3 py-2 text-xs bg-white border border-app-border rounded-lg focus:outline-none focus:border-app-accent">
+                                <button onclick="addNewComfortZone()" class="px-4 py-2 bg-app-accent text-white text-xs font-bold rounded-lg hover:bg-app-accentHover transition-colors shrink-0">追加</button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-4 border-t border-app-border">
+                            <button onclick="saveConfiguration()" class="px-6 py-2.5 bg-app-accent hover:bg-app-accentHover text-white text-xs font-bold rounded-lg shadow-sm transition-all">設定を保存して反映</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==========================================
+                     C. 達成した新しい体験
+                     ========================================== -->
+                <div id="tab-achievements" class="hidden flex-grow flex overflow-y-auto bg-white p-8 w-full">
+                    <div class="max-w-4xl mx-auto w-full space-y-6 text-left">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                    <i class="fa-solid fa-trophy text-yellow-500"></i>
+                                    <span>達成した体験ログ</span>
+                                </h2>
+                                <p class="text-xs text-app-textMuted">ひろしさんがコンフォートゾーンを破って獲得した、人生の原体験ログです。</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold text-app-accent">累計突破ボーナス:</span>
+                                <div class="text-2xl font-black text-gray-800" id="achievement-stat-total">1200 XP</div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4" id="completed-items-grid"></div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- トースト通知 -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-5 py-3 rounded-xl shadow-lifted flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 z-50 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-sm" id="toast-icon"></i>
+        <span id="toast-message" class="font-medium">Notion データベースとの同期が成功しました。</span>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. アプリケーション状態
+        // ==========================================
+
+        let calendarSlots = [
+            { id: 'slot-6-6',  date: '6月6日 (土)',  activeState: '午前のみ空き',     desc: 'ビジネス予定が入る可能性あり',   isSelected: true,  plannedActivity: '1人ボードゲームカフェに突入する' },
+            { id: 'slot-6-7',  date: '6月7日 (日)',  activeState: '終日空きあり',     desc: '終日完全にフリーな1日',          isSelected: false, plannedActivity: null },
+            { id: 'slot-6-13', date: '6月13日 (土)', activeState: '予定あり（キープ）', desc: '夕方から家族との会食',           isSelected: false, plannedActivity: '暗闇と静寂の中で味わう茶道瞑想体験' },
+            { id: 'slot-6-14', date: '6月14日 (日)', activeState: '午後から空き',      desc: '午前中はランニングトレーニング', isSelected: false, plannedActivity: null },
+            { id: 'slot-6-20', date: '6月20日 (土)', activeState: '終日空きあり',     desc: '予定一切なしの空白日',           isSelected: false, plannedActivity: null },
+        ];
+
+        const defaultBucketList = [
+            { id: 1, text: '手作りの陶芸教室で一輪挿しを作る',           tag: 'アウトドア', dateAdded: '2026-05-15', checked: false, note: '粘土の感触とじっくり向き合い、デジタルデトックスをする。Notion側最終更新: 2026-05-15' },
+            { id: 2, text: '暗闇レストラン（ダイアログ・イン・ザ・ダーク）に行く', tag: '極上体験', dateAdded: '2026-05-20', checked: false, note: '視覚を遮断され、味覚と触覚が研ぎ澄まされる感覚を楽しむ。Notion側最終更新: 2026-05-20' },
+            { id: 3, text: '未体験のパラグライダーで空を飛ぶ',             tag: 'アウトドア', dateAdded: '2026-05-25', checked: false, note: '大空を滑空するスリルと圧倒的視野の獲得。Notion側最終更新: 2026-05-25' },
+            { id: 4, text: 'お寺の早朝座禅会に参加してマインドフルネスを体得', tag: 'インドア', dateAdded: '2026-05-10', checked: true,  note: '早朝の冷たく凛とした本堂で、自己の呼吸に全集中する。Notion側最終更新: 2026-05-12' }
+        ];
+
+        const mockEvents = [
+            { id: 101, title: '東京・現代アートフェスタ2026',         date: '6月6日(土)〜',      place: '天王洲アイル',           desc: '運河沿いの倉庫街がデジタルアート一色に。五感で感じるデジタルインスタレーション体験。',         tag: 'アート' },
+            { id: 102, title: '奥多摩・森と渓谷のアウトドアクッキング', date: '6月7日(日) 10:00',  place: '奥多摩ネイチャーリゾート', desc: '自分で火を起こし、ダッチオーブンで作る極上の野外フレンチ体験。',                               tag: 'アウトドア' },
+            { id: 103, title: '暗闇と静寂の中で味わう茶道瞑想体験',    date: '6月13日(土) 18:00', place: '押上・古民家スタジオ',     desc: '暗闇でお茶を点て、その味と香りに極限まで全集中する現代風茶会。',                               tag: '極上体験' },
+            { id: 104, title: '伝統の「蕎麦粉からの十割蕎麦打ち」挑戦', date: '6月20日(土) 13:00', place: '浅草・蕎麦庵',           desc: '蕎麦職人に徹底的に手ほどきを受ける、日本の笑いと伝統の味を学ぶツアー。',                         tag: 'インドア' }
+        ];
+
+        const presetAIProposals = {
+            easy: [{
+                title: '1人ボードゲームカフェに突入する',
+                desc: '他人と偶然相席になり、ルールを教わりながら知らないゲームに興じる、最も手軽な対面交流型インドア体験。',
+                budget: '約2,000円', time: '2時間', stars: 4.0,
+                comfortAnalysis: '既存趣味（ゴルフ・サウナ・ワイン）が「単独/身内」「リラックス」に偏るのに対し、ボードゲーム相席は「初対面での即興コミュニケーション」を伴うため突破度80%。'
+            }],
+            medium: [{
+                title: '吹きガラス工房でマイコップを作る',
+                desc: '1200度の溶解炉からガラスを吹き出し、自分の息だけで世界にひとつのマイグラスを作る、極上の職人技挑戦。',
+                budget: '約5,500円', time: '半日', stars: 4.5,
+                comfortAnalysis: '既存趣味の「消費する体験（お酒を飲む）」から「創造する体験（器を作る）」への大胆なシフト。突破度90%。'
+            }],
+            hard: [{
+                title: 'ヘリコプターチャーターで東京上空を夜間飛行する',
+                desc: '自分のためだけにヘリをチャーターし、高度600mから東京の夜景を360度見下ろす、一生モノのプライベート非日常体験。',
+                budget: '約35,000円', time: '20分', stars: 5.0,
+                comfortAnalysis: '日常のあらゆるルーティン、重力から完全に解き放たれる極限体験。コンフォートゾーン突破度100%。'
+            }]
+        };
+
+        const defaultComfortZones = ['ゴルフ', 'サウナ', 'ワイン', '居酒屋', '温泉'];
+
+        let userXP = 1400;
+        const xpPerLevel = 2000;
+        let currentDifficulty = 'medium';
+        let currentSubTab = 'dashboard';
+        let selectedBucketIdForCombo = null;
+
+        // ==========================================
+        // 2. ローカルストレージ管理
+        // ==========================================
+
+        function loadFromLocalStorage() {
+            if (!localStorage.getItem('ultimate_bucket_list')) {
+                localStorage.setItem('ultimate_bucket_list', JSON.stringify(defaultBucketList));
+            }
+            if (!localStorage.getItem('ultimate_comfort_zones')) {
+                localStorage.setItem('ultimate_comfort_zones', JSON.stringify(defaultComfortZones));
+            }
+            if (localStorage.getItem('ultimate_user_xp')) {
+                userXP = parseInt(localStorage.getItem('ultimate_user_xp'));
+            } else {
+                localStorage.setItem('ultimate_user_xp', userXP.toString());
+            }
+            if (localStorage.getItem('notion_token')) {
+                document.getElementById('input-notion-token').value = localStorage.getItem('notion_token');
+                setNotionAPIConnected(true);
+            }
+            if (localStorage.getItem('gemini_api_key')) {
+                document.getElementById('input-gemini-key').value = localStorage.getItem('gemini_api_key');
+            }
+        }
+
+        function setNotionAPIConnected(connected) {
+            const el = document.getElementById('notion-api-status');
+            el.className = connected
+                ? 'w-2 h-2 rounded-full bg-emerald-500 pulse-indicator'
+                : 'w-2 h-2 rounded-full bg-red-400';
+        }
+
+        function getBucketList() {
+            return JSON.parse(localStorage.getItem('ultimate_bucket_list')) || [];
+        }
+
+        function saveBucketList(list) {
+            localStorage.setItem('ultimate_bucket_list', JSON.stringify(list));
+            renderTimelineBucketList();
+            updateMetrics();
+        }
+
+        // ==========================================
+        // 3. UI演出・アニメーション
+        // ==========================================
+
+        function showToast(message, isSuccess = true) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            document.getElementById('toast-icon').className = isSuccess
+                ? 'fa-solid fa-circle-check text-emerald-400 text-sm'
+                : 'fa-solid fa-circle-exclamation text-amber-500 text-sm';
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function simulateNotionSync() {
+            const btn = document.getElementById('sync-button');
+            const syncIcon = document.getElementById('sync-icon');
+            const timelineContainer = document.getElementById('bucket-timeline-container');
+
+            btn.disabled = true;
+            document.getElementById('sync-btn-text').innerText = '同期しています...';
+            syncIcon.classList.add('fa-spin', 'text-app-accent');
+            timelineContainer.classList.add('notion-sync-rattle');
+
+            setTimeout(() => {
+                btn.disabled = false;
+                document.getElementById('sync-btn-text').innerText = 'Notionと同期';
+                syncIcon.classList.remove('fa-spin', 'text-app-accent');
+                timelineContainer.classList.remove('notion-sync-rattle');
+
+                const list = getBucketList();
+                const today = new Date().toISOString().split('T')[0];
+                list.forEach(item => { item.dateAdded = today; });
+                saveBucketList(list);
+                showToast('Notion データベースとの双方向同期が完了しました！');
+            }, 1200);
+        }
+
+        function gainXP(amount) {
+            userXP += amount;
+            if (userXP < 0) userXP = 0;
+            localStorage.setItem('ultimate_user_xp', userXP.toString());
+
+            const currentLevel = Math.floor(userXP / xpPerLevel) + 1;
+            const currentXPInLevel = userXP % xpPerLevel;
+            const percent = Math.floor((currentXPInLevel / xpPerLevel) * 100);
+
+            document.getElementById('xp-text').innerText = `${currentXPInLevel} / ${xpPerLevel}`;
+            document.getElementById('xp-percent').innerText = `${percent}%`;
+            document.getElementById('xp-bar').style.width = `${percent}%`;
+            document.getElementById('user-level-badge').innerText = `Lv.${currentLevel}`;
+
+            if (amount > 0) {
+                confetti({ particleCount: 80, spread: 60, origin: { y: 0.8 }, colors: ['#C27D38', '#EAE8E2', '#10B981'] });
+                showToast(`+${amount} XP を獲得！レベルアップに近づきました！`);
+            }
+        }
+
+        // ==========================================
+        // 4. 描画処理
+        // ==========================================
+
+        function switchSubTab(tabId) {
+            currentSubTab = tabId;
+            const tabMap = { dashboard: 'dashboard', 'notion-config': 'notion', achievements: 'achievements' };
+
+            ['dashboard', 'notion-config', 'achievements'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const navKey = tabMap[t];
+                const navEl = document.getElementById(`nav-${navKey}`);
+
+                if (t === tabId) {
+                    el.classList.remove('hidden');
+                    if (t === 'dashboard') el.classList.add('flex');
+                    navEl.className = 'flex justify-between items-center px-3 py-2.5 text-xs font-semibold bg-app-activeBg text-app-accent rounded-lg smooth-transition';
+                } else {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                    navEl.className = 'flex justify-between items-center px-3 py-2.5 text-xs font-medium text-app-textMuted hover:bg-gray-100 rounded-lg smooth-transition';
+                }
+            });
+
+            if (tabId === 'achievements') renderAchievements();
+            else if (tabId === 'notion-config') renderComfortZones();
+        }
+
+        function renderCalendarSlots() {
+            const container = document.getElementById('slot-list-container');
+            container.innerHTML = '';
+
+            calendarSlots.forEach(slot => {
+                const isSelected = slot.isSelected;
+                const card = document.createElement('div');
+
+                card.className = `p-4 rounded-xl border text-left cursor-pointer smooth-transition ${
+                    isSelected
+                        ? 'bg-white border-app-accent shadow-premium ring-1 ring-app-accent/20 translate-x-1'
+                        : 'bg-white border-app-border hover:border-amber-400 shadow-subtle'
+                }`;
+                card.addEventListener('click', () => selectCalendarSlot(slot.id));
+
+                let badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-100';
+                if (slot.activeState.includes('予定あり')) badgeClass = 'bg-gray-100 text-gray-500 border-gray-200';
+                if (slot.activeState.includes('計画アサイン完了')) badgeClass = 'bg-amber-50 text-app-accent border-amber-200';
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-1.5">
+                        <span class="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-app-accent' : 'bg-gray-300'}"></span>
+                            ${slot.date}
+                        </span>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded border ${badgeClass} font-bold shrink-0">${slot.activeState}</span>
+                    </div>
+                    <p class="text-[10px] text-app-textMuted leading-normal truncate">${slot.desc}</p>
+                    ${slot.plannedActivity
+                        ? `<div class="mt-2.5 pt-2 border-t border-app-border flex items-center gap-1.5 text-[10px] text-app-accent font-bold">
+                               <i class="fa-solid fa-flag text-[9px]"></i>
+                               <span class="truncate">${slot.plannedActivity}</span>
+                           </div>`
+                        : `<div class="mt-2.5 text-[9px] text-gray-400 italic">空き枠アサイン可能</div>`
+                    }
+                `;
+                container.appendChild(card);
+            });
+
+            const availableCount = calendarSlots.filter(s => !s.plannedActivity).length;
+            document.getElementById('slot-count-badge').innerText = availableCount;
+        }
+
+        function renderActivePlanCard() {
+            const activeSlot = calendarSlots.find(s => s.isSelected);
+            const container = document.getElementById('active-plan-card');
+            if (!activeSlot) return;
+
+            document.getElementById('header-selected-date').innerText = `${activeSlot.date} の新規体験計画`;
+            const initial = activeSlot.date.substring(0, 2);
+
+            container.innerHTML = `
+                <div class="flex items-start gap-4">
+                    <div class="w-11 h-11 rounded-xl bg-amber-50 text-app-accent flex items-center justify-center font-bold text-sm border border-amber-100 shrink-0 shadow-subtle">
+                        ${initial}
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h2 class="text-base font-bold text-gray-800">${activeSlot.date}</h2>
+                            <span class="text-[9px] bg-amber-100 text-app-accent px-2 py-0.5 rounded-full font-bold">計画検討中</span>
+                        </div>
+                        <p class="text-[11px] text-app-textMuted">${activeSlot.desc}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-app-border">
+                    <div>
+                        <span class="text-[9px] font-bold text-app-textMuted block mb-1 uppercase tracking-wider">決定されたアサイン体験</span>
+                        <div class="p-3 bg-white border border-app-border rounded-xl min-h-[50px] flex items-center justify-between shadow-subtle">
+                            ${activeSlot.plannedActivity
+                                ? `<span class="text-xs font-bold text-gray-800 truncate">${activeSlot.plannedActivity}</span>
+                                   <button onclick="clearPlannedActivity('${activeSlot.id}')" class="text-gray-400 hover:text-red-500 text-[11px] transition-colors ml-2 shrink-0">
+                                       <i class="fa-solid fa-trash-can"></i>
+                                   </button>`
+                                : `<span class="text-xs text-gray-400 italic">バケットまたは右のAI提案から適用</span>`
+                            }
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-[9px] font-bold text-app-textMuted block mb-1 uppercase tracking-wider">時間割り当て・ステータス</span>
+                        <div class="p-3 bg-white border border-app-border rounded-xl min-h-[50px] flex items-center shadow-subtle">
+                            <span class="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-indicator"></span>
+                                ${activeSlot.activeState}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTimelineBucketList() {
+            const list = getBucketList();
+            const container = document.getElementById('bucket-timeline-container');
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                container.innerHTML = '<div class="text-xs text-app-textMuted italic p-4 text-center">バケットリストが空です。Notionに追加しましょう！</div>';
+                return;
+            }
+
+            const line = document.createElement('div');
+            line.className = 'absolute left-2.5 top-3.5 bottom-3 w-[1px] bg-app-border';
+            container.appendChild(line);
+
+            list.forEach(item => {
+                const isSelectedForCombo = selectedBucketIdForCombo === item.id;
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'relative pl-8 text-left group';
+
+                let tagColor = 'bg-blue-50 text-blue-700 border-blue-100';
+                if (item.tag === 'アウトドア') tagColor = 'bg-emerald-50 text-emerald-700 border-emerald-100';
+                if (item.tag === '極上体験')  tagColor = 'bg-purple-50 text-purple-700 border-purple-100';
+
+                itemDiv.innerHTML = `
+                    <div class="absolute left-0 top-2 timeline-node rounded-full ${item.checked ? 'bg-app-accent text-white' : 'bg-white border border-app-border text-gray-300'} flex items-center justify-center text-[9px] z-10 cursor-pointer hover:scale-110 smooth-transition"
+                         onclick="toggleBucketItemChecked(${item.id})">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <div class="bg-white border rounded-xl p-3.5 hover:shadow-subtle smooth-transition ${isSelectedForCombo ? 'ring-2 ring-app-accent/40 border-app-accent' : 'border-app-border'} cursor-pointer"
+                         onclick="clickBucketItemForCombo(${item.id})">
+                        <div class="flex justify-between items-start gap-4">
+                            <div class="space-y-1 flex-grow">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h4 class="text-xs font-bold text-gray-800 ${item.checked ? 'line-through text-gray-400' : ''}">${item.text}</h4>
+                                    <span class="text-[8px] px-1.5 py-0.5 rounded border ${tagColor} font-bold shrink-0">${item.tag}</span>
+                                </div>
+                                <p class="text-[10px] text-app-textMuted leading-relaxed">${item.note}</p>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button onclick="event.stopPropagation(); assignItemToActivePlan('${item.text.replace(/'/g, "\\'")}')"
+                                        class="text-[9px] bg-gray-50 border border-app-border hover:border-app-accent hover:bg-amber-50 hover:text-app-accent px-2 py-1 rounded-md font-bold transition-all">
+                                    アサイン
+                                </button>
+                                <button onclick="event.stopPropagation(); deleteBucketItem(${item.id})"
+                                        class="text-gray-300 hover:text-red-500 p-1 transition-colors">
+                                    <i class="fa-solid fa-trash-can text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 flex justify-between items-center text-[8px] text-app-textMuted border-t border-app-border/40 pt-2 font-mono">
+                            <span>最終同期: ${item.dateAdded}</span>
+                            <span>Notion ID: #NOT-${String(item.id).substring(0, 5)}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        // ==========================================
+        // 5. AI提案パネル
+        // ==========================================
+
+        async function renderAIPanel() {
+            const container = document.getElementById('ai-proposal-box');
+            const activeSlot = calendarSlots.find(s => s.isSelected);
+            const selectedBucket = selectedBucketIdForCombo
+                ? getBucketList().find(item => item.id === selectedBucketIdForCombo)
+                : null;
+
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-10 space-y-3">
+                    <div class="w-8 h-8 border-4 border-app-accent border-t-transparent rounded-full animate-spin"></div>
+                    <p class="text-[10px] text-app-textMuted font-medium animate-pulse">掛け算プランを構築中...</p>
+                </div>
+            `;
+
+            const comfortZones = JSON.parse(localStorage.getItem('ultimate_comfort_zones')) || defaultComfortZones;
+            const geminiKey = localStorage.getItem('gemini_api_key');
+            let proposalData = null;
+
+            if (geminiKey && geminiKey.trim() !== '') {
+                try {
+                    proposalData = await generateComboWithGemini(geminiKey, activeSlot, selectedBucket, currentDifficulty, comfortZones);
+                } catch (e) {
+                    console.error('Gemini API Error:', e);
+                    showToast('Gemini API連携エラー。フォールバック提案を構築します。', false);
+                    proposalData = generateLocalCombo(activeSlot, selectedBucket, currentDifficulty, comfortZones);
+                }
+            } else {
+                proposalData = generateLocalCombo(activeSlot, selectedBucket, currentDifficulty, comfortZones);
+            }
+
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.floor(proposalData.stars)) {
+                    starsHtml += '<i class="fa-solid fa-star text-app-accent"></i>';
+                } else if (i - 0.5 <= proposalData.stars) {
+                    starsHtml += '<i class="fa-solid fa-star-half-stroke text-app-accent"></i>';
+                } else {
+                    starsHtml += '<i class="fa-regular fa-star text-gray-300"></i>';
+                }
+            }
+
+            const safeTitle = proposalData.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            const safeDiff  = currentDifficulty;
+            const safeDesc  = (proposalData.desc || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+            container.innerHTML = `
+                <div class="space-y-3 text-left">
+                    <div class="flex justify-between items-start gap-2">
+                        <span class="text-[8px] font-bold bg-amber-100 text-app-accent px-1.5 py-0.5 rounded uppercase">${currentDifficulty.toUpperCase()}</span>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[9px] text-app-textMuted font-bold">コンフォートゾーン突破度:</span>
+                            <div class="text-[8px] flex gap-0.5">${starsHtml}</div>
+                        </div>
+                    </div>
+                    <h4 class="text-xs font-bold text-gray-800 leading-snug">${proposalData.title}</h4>
+                    <p class="text-[10px] text-app-textMuted leading-relaxed">${proposalData.desc}</p>
+                    <div class="grid grid-cols-2 gap-2 text-[9px] bg-white border border-app-border rounded-lg p-2.5 shadow-subtle">
+                        <div><span class="text-app-textMuted block">想定予算</span> <strong class="text-gray-800">${proposalData.budget}</strong></div>
+                        <div><span class="text-app-textMuted block">所要時間</span> <strong class="text-gray-800">${proposalData.time}</strong></div>
+                    </div>
+                    <div class="text-[9px] bg-white border border-dashed border-amber-200 p-2.5 rounded-lg text-app-accent leading-relaxed shadow-subtle">
+                        <div class="font-bold flex items-center gap-1 mb-1">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> 突破分析 (既存趣味: ${comfortZones.slice(0, 3).join(', ')}等から乖離)
+                        </div>
+                        ${proposalData.comfortAnalysis}
+                    </div>
+                    <div class="flex gap-2 pt-1">
+                        <button onclick="assignItemToActivePlan('${safeTitle}')"
+                                class="flex-grow py-2 bg-app-accent hover:bg-app-accentHover text-white text-[10px] font-bold rounded-lg shadow-sm transition-colors flex items-center justify-center gap-1">
+                            <i class="fa-regular fa-calendar-check"></i> この空き枠に適用
+                        </button>
+                        <button onclick="addProposalToBucket('${safeTitle}', '${safeDiff}', '${safeDesc}')"
+                                class="px-2.5 py-2 border border-app-border hover:bg-gray-50 rounded-lg text-[10px] text-gray-500 smooth-transition" title="バケットリストに追加">
+                            <i class="fa-regular fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateLocalCombo(slot, bucketItem, difficulty, comfortZones) {
+            const timeDesc = slot ? slot.activeState : '週末の空き時間';
+
+            if (bucketItem) {
+                return {
+                    title: `${timeDesc}で本格挑戦！『${bucketItem.text}』スペシャルセッション`,
+                    desc: `${bucketItem.text}にフル集中するための特別計画。${slot ? slot.desc : ''}という前提を逆手に取り、余計なタスクを全て忘れる極上のソロ時間をセットアップ。`,
+                    budget: difficulty === 'easy' ? '約3,000円' : difficulty === 'medium' ? '約8,000円' : '約20,000円',
+                    time: slot && (slot.activeState.includes('午前') || slot.activeState.includes('午後')) ? '3時間' : '丸1日',
+                    stars: difficulty === 'easy' ? 3.5 : difficulty === 'medium' ? 4.5 : 5.0,
+                    comfortAnalysis: `バケットリスト「${bucketItem.text}」を「${timeDesc}」にピンポイントでねじ込みます。既存の趣味である【${comfortZones.slice(0, 2).join('・')}】とは物理的にも精神的にも異なる次元の刺激。`
+                };
+            }
+
+            const base = presetAIProposals[difficulty][0];
+            return {
+                title: `${timeDesc}に最適: ${base.title}`,
+                desc: `${base.desc}${slot ? ` （${slot.desc}の空き時間を利用）` : ''}`,
+                budget: base.budget,
+                time: base.time,
+                stars: base.stars,
+                comfortAnalysis: base.comfortAnalysis
+            };
+        }
+
+        async function generateComboWithGemini(apiKey, slot, bucketItem, difficulty, comfortZones) {
+            const userPrompt = `ひろしさんの新しい体験プランを提案してください。
+【条件】
+- 予定時間枠: ${slot ? slot.date + ' ' + slot.activeState : '週末の空き枠'}
+- 時間枠の詳細: ${slot ? slot.desc : ''}
+- チャレンジ難易度: ${difficulty}
+- Notionバケットストック（指定あれば最優先で掛け算する）: ${bucketItem ? bucketItem.text : 'なし（自由に提案）'}
+- ひろしの既存の趣味（＝コンフォートゾーン、ここからなるべく「ズレている」ほど良い）: ${comfortZones.join(', ')}
+
+【出力形式】
+以下のJSONフォーマットのみで厳密に返答してください（余計な説明文やコードフェンスは不要）。
+{"title":"...","desc":"...","budget":"...","time":"...","stars":4.5,"comfortAnalysis":"..."}`;
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    generationConfig: { responseMimeType: 'application/json' }
+                })
+            });
+            if (!response.ok) throw new Error('Gemini API Error: ' + response.status);
+            const result = await response.json();
+            const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+            return JSON.parse(text);
+        }
+
+        // ==========================================
+        // 6. イベントパネル
+        // ==========================================
+
+        function renderEventsPanel() {
+            const container = document.getElementById('event-feed-container');
+            container.innerHTML = '';
+
+            mockEvents.forEach(event => {
+                const card = document.createElement('div');
+                card.className = 'bg-white border border-app-border rounded-xl p-3.5 text-left interactive-card shadow-subtle space-y-2';
+                const safeTitle = event.title.replace(/'/g, "\\'");
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-[8px] px-1.5 py-0.5 bg-gray-100 rounded border border-gray-200 font-bold text-app-textMuted uppercase">${event.tag}</span>
+                        <span class="text-[9px] text-app-textMuted"><i class="fa-solid fa-map-pin mr-1"></i>${event.place}</span>
+                    </div>
+                    <h4 class="text-xs font-bold text-gray-800 leading-snug">${event.title}</h4>
+                    <p class="text-[10px] text-app-textMuted leading-relaxed line-clamp-2">${event.desc}</p>
+                    <div class="flex justify-between items-center border-t border-app-border/40 pt-2.5 mt-1">
+                        <span class="text-[9px] text-app-accent font-bold"><i class="fa-regular fa-clock mr-1"></i>${event.date}</span>
+                        <button onclick="assignItemToActivePlan('${safeTitle}')"
+                                class="text-[9px] bg-amber-50 hover:bg-app-accent hover:text-white border border-amber-200 px-2.5 py-1 rounded-md font-bold smooth-transition">
+                            カレンダーに仮割当
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ==========================================
+        // 7. コンフォートゾーン設定
+        // ==========================================
+
+        function renderComfortZones() {
+            const container = document.getElementById('comfort-zone-tags-container');
+            if (!container) return;
+            container.innerHTML = '';
+            const zones = JSON.parse(localStorage.getItem('ultimate_comfort_zones')) || defaultComfortZones;
+            zones.forEach((tag, idx) => {
+                const span = document.createElement('span');
+                span.className = 'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-app-border text-xs text-gray-700 font-medium shadow-subtle';
+                span.innerHTML = `<span>${tag}</span><button onclick="removeComfortZone(${idx})" class="text-gray-400 hover:text-red-500 font-bold">×</button>`;
+                container.appendChild(span);
+            });
+        }
+
+        // ==========================================
+        // 8. 実績ログ
+        // ==========================================
+
+        function renderAchievements() {
+            const list = getBucketList();
+            const completed = list.filter(item => item.checked);
+            const grid = document.getElementById('completed-items-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const totalXP = completed.length * 1000 + 400;
+            document.getElementById('achievement-stat-total').innerText = `${totalXP} XP`;
+
+            if (completed.length === 0) {
+                grid.innerHTML = '<div class="col-span-2 text-xs text-app-textMuted italic text-center py-10 bg-app-sidebar rounded-xl border border-dashed border-app-border">まだ達成された新規体験はありません。週末に一歩踏み出し、完了チェックを入れてログを残しましょう！</div>';
+                return;
+            }
+
+            completed.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white border border-app-border rounded-xl p-4 text-left shadow-subtle flex flex-col justify-between';
+                card.innerHTML = `
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[8px] px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full font-bold">突破成功 (+1000 XP)</span>
+                            <span class="text-[9px] font-mono text-app-textMuted">${item.dateAdded}</span>
+                        </div>
+                        <h3 class="text-xs font-bold text-gray-800">${item.text}</h3>
+                        <p class="text-[10px] text-app-textMuted leading-relaxed">${item.note}</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-app-border/40 flex justify-between items-center text-[9px] text-app-accent">
+                        <span><i class="fa-solid fa-trophy mr-1"></i>ひろしの人生資産</span>
+                        <strong class="font-bold">コンフォートゾーン突破 Lv.UP!</strong>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function updateMetrics() {
+            const list = getBucketList();
+            document.getElementById('metric-stock').innerText    = list.length;
+            document.getElementById('metric-assigned').innerText = calendarSlots.filter(s => s.plannedActivity).length;
+            document.getElementById('metric-completed').innerText = list.filter(item => item.checked).length;
+            document.getElementById('completed-count-badge').innerText = list.filter(item => item.checked).length;
+        }
+
+        // ==========================================
+        // 9. アクションハンドラー
+        // ==========================================
+
+        function selectCalendarSlot(id) {
+            calendarSlots.forEach(slot => { slot.isSelected = (slot.id === id); });
+            renderCalendarSlots();
+            renderActivePlanCard();
+            renderAIPanel();
+        }
+
+        function clickBucketItemForCombo(id) {
+            selectedBucketIdForCombo = selectedBucketIdForCombo === id ? null : id;
+            renderTimelineBucketList();
+            renderAIPanel();
+        }
+
+        function assignItemToActivePlan(title) {
+            const activeSlot = calendarSlots.find(s => s.isSelected);
+            if (activeSlot) {
+                activeSlot.plannedActivity = title;
+                activeSlot.activeState = '計画アサイン完了';
+                renderCalendarSlots();
+                renderActivePlanCard();
+                updateMetrics();
+                showToast(`「${title}」を ${activeSlot.date} にアサインしました。`);
+            } else {
+                showToast('計画をアサインするカレンダーの空き枠を左カラムから選んでください。', false);
+            }
+        }
+
+        function clearPlannedActivity(slotId) {
+            const slot = calendarSlots.find(s => s.id === slotId);
+            if (slot) {
+                slot.plannedActivity = null;
+                // 元のステータスを推定して復元
+                if (slotId.includes('6-7') || slotId.includes('6-20')) {
+                    slot.activeState = '終日空きあり';
+                } else if (slotId.includes('6-14')) {
+                    slot.activeState = '午後から空き';
+                } else if (slotId.includes('6-13')) {
+                    slot.activeState = '予定あり（キープ）';
+                } else {
+                    slot.activeState = '午前のみ空き';
+                }
+                renderCalendarSlots();
+                renderActivePlanCard();
+                updateMetrics();
+                showToast('アサインされた計画を解除しました。');
+            }
+        }
+
+        function toggleBucketItemChecked(id) {
+            const list = getBucketList();
+            const item = list.find(item => item.id === id);
+            if (item) {
+                item.checked = !item.checked;
+                saveBucketList(list);
+                if (item.checked) {
+                    gainXP(1000);
+                } else {
+                    userXP = Math.max(0, userXP - 1000);
+                    gainXP(0);
+                    showToast('達成チェックを解除しました。');
+                }
+            }
+        }
+
+        function saveNewBucketItem() {
+            const textInput = document.getElementById('new-item-text');
+            const noteInput = document.getElementById('new-item-note');
+            const tagSelect = document.getElementById('new-item-tag');
+
+            if (!textInput.value.trim()) {
+                showToast('体験名を入力してください。', false);
+                return;
+            }
+
+            const list = getBucketList();
+            list.unshift({
+                id: Date.now(),
+                text: textInput.value.trim(),
+                tag: tagSelect.value,
+                dateAdded: new Date().toISOString().split('T')[0],
+                checked: false,
+                note: noteInput.value.trim() || 'Notionに同期された新規の体験ストック'
+            });
+            saveBucketList(list);
+            textInput.value = '';
+            noteInput.value = '';
+            closeAddBucketForm();
+            showToast('Notion バケットリストに新しいアイデアを同期・保存しました！');
+        }
+
+        function addProposalToBucket(title, difficulty, desc) {
+            const list = getBucketList();
+            if (list.some(item => item.text === title)) {
+                showToast('すでにバケットリストに存在する体験です。', false);
+                return;
+            }
+            list.unshift({
+                id: Date.now(),
+                text: title,
+                tag: difficulty === 'easy' ? 'インドア' : difficulty === 'medium' ? '極上体験' : 'アウトドア',
+                dateAdded: new Date().toISOString().split('T')[0],
+                checked: false,
+                note: desc
+            });
+            saveBucketList(list);
+            showToast(`「${title}」をNotion同期バケットリストに追加しました！`);
+        }
+
+        function deleteBucketItem(id) {
+            saveBucketList(getBucketList().filter(item => item.id !== id));
+            showToast('バケット項目を削除しました。');
+        }
+
+        function changeDifficulty(diff) {
+            currentDifficulty = diff;
+            ['easy', 'medium', 'hard'].forEach(d => {
+                const btn = document.getElementById(`diff-${d}`);
+                btn.className = d === diff
+                    ? 'px-2.5 py-1 rounded-md bg-white text-gray-800 shadow-sm smooth-transition font-bold'
+                    : 'px-2.5 py-1 rounded-md text-app-textMuted smooth-transition';
+            });
+            renderAIPanel();
+        }
+
+        function addNewComfortZone() {
+            const input = document.getElementById('new-comfort-tag');
+            const val = input.value.trim();
+            if (!val) return;
+            const zones = JSON.parse(localStorage.getItem('ultimate_comfort_zones')) || defaultComfortZones;
+            if (!zones.includes(val)) {
+                zones.push(val);
+                localStorage.setItem('ultimate_comfort_zones', JSON.stringify(zones));
+                renderComfortZones();
+                input.value = '';
+                showToast(`「${val}」をコンフォートゾーン（既存趣味）に登録しました。`);
+            }
+        }
+
+        function removeComfortZone(index) {
+            const zones = JSON.parse(localStorage.getItem('ultimate_comfort_zones')) || defaultComfortZones;
+            zones.splice(index, 1);
+            localStorage.setItem('ultimate_comfort_zones', JSON.stringify(zones));
+            renderComfortZones();
+        }
+
+        function resetComfortZones() {
+            localStorage.setItem('ultimate_comfort_zones', JSON.stringify(defaultComfortZones));
+            renderComfortZones();
+            showToast('既存の趣味設定を初期状態にリセットしました。');
+        }
+
+        function saveConfiguration() {
+            const notionToken = document.getElementById('input-notion-token').value.trim();
+            const geminiKey   = document.getElementById('input-gemini-key').value.trim();
+
+            if (notionToken) {
+                localStorage.setItem('notion_token', notionToken);
+                setNotionAPIConnected(true);
+            } else {
+                localStorage.removeItem('notion_token');
+                setNotionAPIConnected(false);
+            }
+
+            if (geminiKey) {
+                localStorage.setItem('gemini_api_key', geminiKey);
+            } else {
+                localStorage.removeItem('gemini_api_key');
+            }
+
+            showToast('各種設定（Notion ＆ Gemini API）が正常に保存されました。');
+            renderAIPanel();
+        }
+
+        function toggleAddBucketForm() {
+            const form = document.getElementById('add-bucket-form');
+            form.classList.toggle('hidden');
+            form.classList.toggle('flex');
+        }
+
+        function closeAddBucketForm() {
+            const form = document.getElementById('add-bucket-form');
+            form.classList.add('hidden');
+            form.classList.remove('flex');
+        }
+
+        function resetCockpit() {
+            localStorage.removeItem('ultimate_bucket_list');
+            localStorage.removeItem('ultimate_comfort_zones');
+            localStorage.removeItem('ultimate_user_xp');
+            userXP = 1400;
+            calendarSlots = [
+                { id: 'slot-6-6',  date: '6月6日 (土)',  activeState: '午前のみ空き',      desc: 'ビジネス予定が入る可能性あり',   isSelected: true,  plannedActivity: '1人ボードゲームカフェに突入する' },
+                { id: 'slot-6-7',  date: '6月7日 (日)',  activeState: '終日空きあり',      desc: '終日完全にフリーな1日',          isSelected: false, plannedActivity: null },
+                { id: 'slot-6-13', date: '6月13日 (土)', activeState: '予定あり（キープ）', desc: '夕方から家族との会食',           isSelected: false, plannedActivity: '暗闇と静寂の中で味わう茶道瞑想体験' },
+                { id: 'slot-6-14', date: '6月14日 (日)', activeState: '午後から空き',       desc: '午前中はランニングトレーニング', isSelected: false, plannedActivity: null },
+                { id: 'slot-6-20', date: '6月20日 (土)', activeState: '終日空きあり',      desc: '予定一切なしの空白日',           isSelected: false, plannedActivity: null },
+            ];
+            loadFromLocalStorage();
+            renderCalendarSlots();
+            renderActivePlanCard();
+            renderTimelineBucketList();
+            renderAIPanel();
+            renderEventsPanel();
+            updateMetrics();
+            gainXP(0);
+            showToast('コックピットの全データを初期設定に戻しました。');
+        }
+
+        // ==========================================
+        // 10. 初期化
+        // ==========================================
+        window.onload = function() {
+            loadFromLocalStorage();
+            renderCalendarSlots();
+            renderActivePlanCard();
+            renderTimelineBucketList();
+            renderAIPanel();
+            renderEventsPanel();
+            updateMetrics();
+            gainXP(0);
+        };
+    </script>
+</body>
+</html>

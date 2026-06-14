@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>グループセッション準備 図解</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: #F7F6F3;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 760px;
+    width: 100%;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #37352F;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 12px;
+    color: #9B9B9B;
+    margin-bottom: 32px;
+  }
+
+  /* ─── STEPS ─── */
+  .steps { display: flex; flex-direction: column; gap: 16px; }
+
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .step-line {
+    width: 2px;
+    flex: 1;
+    min-height: 20px;
+    margin: 4px 0;
+  }
+  .step-body {
+    flex: 1;
+    padding-bottom: 8px;
+  }
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .badge-required {
+    background: #FFE8E8;
+    color: #E03E3E;
+  }
+  .badge-optional {
+    background: #E8F4E8;
+    color: #2D7A2D;
+  }
+  .step-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #37352F;
+  }
+  .step-detail {
+    font-size: 12px;
+    color: #6B6B6B;
+    line-height: 1.7;
+  }
+
+  /* ─── STEP COLORS ─── */
+  .s1 .step-num { background: #FFEFC0; color: #8A6800; }
+  .s1 .step-line { background: #FFD96A; }
+  .s2 .step-num { background: #D0E8FF; color: #0055B3; }
+  .s2 .step-line { background: #90C2FF; }
+  .s3 .step-num { background: #D4F0D4; color: #1A6B1A; }
+
+  /* ─── GRILL-ME BOX ─── */
+  .grillme {
+    background: #FEFCE8;
+    border: 1.5px solid #FCD34D;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #6B5C00;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .grillme-icon { font-size: 20px; flex-shrink: 0; }
+
+  /* sub items */
+  .sub-items {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .sub-item {
+    background: #F0F0EE;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 11px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sub-item .dot { width: 6px; height: 6px; border-radius: 50%; background: #AAAAAA; }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    border: none;
+    border-top: 1.5px dashed #E0E0E0;
+    margin: 28px 0;
+  }
+
+  /* ─── SESSION GOAL ─── */
+  .goal-box {
+    background: #F3F0FF;
+    border-radius: 14px;
+    padding: 20px 24px;
+  }
+  .goal-box h2 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #5B3FD4;
+    margin-bottom: 12px;
+  }
+  .goal-row {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+  }
+  .goal-item {
+    flex: 1;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 11px;
+    line-height: 1.65;
+  }
+  .goal-item strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .goal-decided {
+    background: #EEF4FF;
+    color: #2244AA;
+  }
+  .goal-undecided {
+    background: #FFF0F6;
+    color: #AA2255;
+  }
+  .goal-arrow {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    color: #999;
+  }
+  .goal-result {
+    background: #EDF7ED;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 11px;
+    line-height: 1.65;
+    color: #1A5C1A;
+    flex: 1;
+  }
+  .goal-result strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  /* ─── MEMO ─── */
+  .memo {
+    margin-top: 16px;
+    background: #F7F6F3;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 11px;
+    color: #888;
+    line-height: 1.7;
+  }
+  .memo::before {
+    content: "💡 ";
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>グループセッション 事前準備</h1>
+  <p class="subtitle">grill-me で整理してセッションに臨む 3 ステップ</p>
+
+  <div class="steps">
+
+    <!-- STEP 1 -->
+    <div class="step s1">
+      <div class="step-left">
+        <div class="step-num">1</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-header">
+          <span class="badge badge-required">必須</span>
+          <span class="step-title">grill-me で「保存設計」を言語化する</span>
+        </div>
+        <p class="step-detail">自分のアプリで「何を保存したいか」「どこに保存するか」を整理し、<br>自分の言葉で説明できる状態にする</p>
+        <div class="sub-items" style="margin-top:10px;">
+          <div class="sub-item"><div class="dot" style="background:#F5A623;"></div>何を保存したいか</div>
+          <div class="sub-item"><div class="dot" style="background:#7B68EE;"></div>DBに入れるもの</div>
+          <div class="sub-item"><div class="dot" style="background:#50C878;"></div>リポジトリに残すもの</div>
+        </div>
+        <div class="grillme">
+          <span class="grillme-icon">🔥</span>
+          <div>
+            <strong style="display:block; margin-bottom:2px;">grill-me とは？</strong>
+            AIと対話しながら、自分の考えをメモとして整理するツール。<br>
+            「決まったこと」も「迷っていること」も書き出しておく。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step s2">
+      <div class="step-left">
+        <div class="step-num">2</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-header">
+          <span class="badge badge-optional">任意</span>
+          <span class="step-title">テーブル設計を AI と相談する</span>
+        </div>
+        <p class="step-detail">「どんな表（テーブル）に分けるか」をAIと一緒に考えてみる</p>
+        <div class="sub-items" style="margin-top:10px;">
+          <div class="sub-item"><div class="dot" style="background:#4A90D9;"></div>テーブル名・カラム名の案を出す</div>
+          <div class="sub-item"><div class="dot" style="background:#4A90D9;"></div>迷いをAIにぶつけてみる</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step s3">
+      <div class="step-left">
+        <div class="step-num">3</div>
+      </div>
+      <div class="step-body">
+        <div class="step-header">
+          <span class="badge badge-optional">任意</span>
+          <span class="step-title">実装 or 動くデモを用意する</span>
+        </div>
+        <p class="step-detail">データ保存の実装に着手する、または画面を見せながら話せるデモを準備する</p>
+      </div>
+    </div>
+
+  </div>
+
+  <hr class="divider">
+
+  <!-- SESSION GOAL -->
+  <div class="goal-box">
+    <h2>🎯 グループセッションで共有するもの</h2>
+    <div class="goal-row">
+      <div class="goal-item goal-decided">
+        <strong>✅ 決まったこと</strong>
+        保存する対象、テーブル設計、実装方針など
+      </div>
+      <div class="goal-arrow">＋</div>
+      <div class="goal-item goal-undecided">
+        <strong>🤔 まだ迷っていること</strong>
+        判断できていない部分、悩んでいる設計の選択肢
+      </div>
+      <div class="goal-arrow">→</div>
+      <div class="goal-result">
+        <strong>💬 セッションの価値</strong>
+        <em>迷っている部分をメンバーと共有する</em>ことが、このセッションの核心
+      </div>
+    </div>
+  </div>
+
+  <div class="memo">
+    覚える必要なし。grill-me のメモや自分の画面を見ながら話せば OK！
+  </div>
+</div>
+</body>
+</html>
