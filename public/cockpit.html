@@ -54,6 +54,15 @@
         @keyframes pulse-light { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
         .pulse-indicator { animation: pulse-light 1.5s infinite; }
         .timeline-node { width: 22px; height: 22px; }
+        /* モバイル対応 */
+        @media (max-width: 767px) {
+            .mobile-only { display: flex !important; }
+            .mobile-pane-hidden { display: none !important; }
+        }
+        @media (min-width: 768px) {
+            .mobile-only { display: none !important; }
+            .mobile-pane-hidden { display: flex !important; }
+        }
         /* DBロード中のスケルトン */
         @keyframes shimmer {
             0% { background-position: -200% 0; }
@@ -67,15 +76,15 @@
         }
     </style>
 </head>
-<body class="bg-app-bg font-sans text-app-textMain antialiased h-screen overflow-hidden flex flex-col smooth-transition">
+<body class="bg-app-bg font-sans text-app-textMain antialiased h-screen overflow-hidden flex flex-col smooth-transition pb-16 md:pb-0">
 
     <!-- DB接続ステータスバー -->
     <div id="db-status-bar" class="hidden w-full text-center text-[10px] py-1 font-semibold z-50"></div>
 
     <div class="flex flex-1 overflow-hidden h-full">
 
-        <!-- 左サイドバー -->
-        <aside class="w-64 bg-app-sidebar border-r border-app-border flex flex-col justify-between shrink-0 select-none z-20">
+        <!-- 左サイドバー (PC only) -->
+        <aside class="w-64 bg-app-sidebar border-r border-app-border hidden md:flex flex-col justify-between shrink-0 select-none z-20">
             <div class="p-5">
                 <div class="flex items-center gap-3 mb-8">
                     <div class="w-9 h-9 bg-app-accent rounded-xl flex items-center justify-center text-white font-bold shadow-md">
@@ -158,21 +167,28 @@
 
         <!-- メインコンテンツ -->
         <main class="flex-1 flex flex-col overflow-hidden">
-            <header class="bg-white border-b border-app-border px-6 py-4 flex justify-between items-center shrink-0 z-10 shadow-sm">
+            <header class="bg-white border-b border-app-border px-4 md:px-6 py-3 md:py-4 flex justify-between items-center shrink-0 z-10 shadow-sm">
                 <div class="flex items-center gap-2 text-xs text-app-textMuted">
-                    <span>体験管理コックピット</span>
-                    <i class="fa-solid fa-chevron-right text-[9px] text-gray-300"></i>
-                    <span class="text-gray-800 font-semibold" id="header-selected-date">6月6日 (土) の計画</span>
+                    <!-- モバイル: アプリ名 -->
+                    <div class="flex items-center gap-2 md:hidden">
+                        <div class="w-7 h-7 bg-app-accent rounded-lg flex items-center justify-center text-white">
+                            <i class="fa-solid fa-compass-drafting text-sm"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 text-sm">体験創造コックピット</span>
+                    </div>
+                    <!-- PC: パンくず -->
+                    <span class="hidden md:inline">体験管理コックピット</span>
+                    <i class="fa-solid fa-chevron-right text-[9px] text-gray-300 hidden md:inline"></i>
+                    <span class="text-gray-800 font-semibold hidden md:inline" id="header-selected-date">6月6日 (土) の計画</span>
                 </div>
-                <div class="flex items-center gap-5">
-                    <!-- DB保存ステータスインジケーター -->
+                <div class="flex items-center gap-3 md:gap-5">
                     <span id="save-indicator" class="text-[10px] text-gray-400 flex items-center gap-1 opacity-0 transition-opacity">
                         <i class="fa-solid fa-cloud-arrow-up"></i> <span id="save-indicator-text">保存中...</span>
                     </span>
-                    <button onclick="resetCockpit()" class="text-xs text-app-accent hover:text-amber-800 flex items-center gap-1.5 font-medium transition-colors">
+                    <button onclick="resetCockpit()" class="hidden md:flex text-xs text-app-accent hover:text-amber-800 items-center gap-1.5 font-medium transition-colors">
                         <i class="fa-solid fa-rotate-left text-[11px]"></i> 初期データに戻す
                     </button>
-                    <div class="h-4 w-[1px] bg-app-border"></div>
+                    <div class="h-4 w-[1px] bg-app-border hidden md:block"></div>
                     <i class="fa-solid fa-sliders text-app-textMuted hover:text-gray-800 cursor-pointer smooth-transition" onclick="switchSubTab('notion-config')"></i>
                 </div>
             </header>
@@ -180,10 +196,30 @@
             <div id="main-tab-content" class="flex-1 flex overflow-hidden">
 
                 <!-- A. ダッシュボード -->
-                <div id="tab-dashboard" class="flex-grow flex overflow-hidden w-full">
+                <div id="tab-dashboard" class="flex-grow flex flex-col overflow-hidden w-full">
+
+                    <!-- モバイル用パネル切り替えタブ -->
+                    <div class="mobile-only shrink-0 bg-white border-b border-app-border">
+                        <div class="flex">
+                            <button onclick="switchMobilePane('calendar')" id="mpane-tab-calendar"
+                                    class="flex-1 py-2.5 text-[11px] font-bold text-app-accent border-b-2 border-app-accent flex items-center justify-center gap-1.5">
+                                <i class="fa-regular fa-calendar-days"></i> カレンダー
+                            </button>
+                            <button onclick="switchMobilePane('bucket')" id="mpane-tab-bucket"
+                                    class="flex-1 py-2.5 text-[11px] font-bold text-app-textMuted border-b-2 border-transparent flex items-center justify-center gap-1.5">
+                                <i class="fa-brands fa-notion"></i> バケットリスト
+                            </button>
+                            <button onclick="switchMobilePane('ai')" id="mpane-tab-ai"
+                                    class="flex-1 py-2.5 text-[11px] font-bold text-app-textMuted border-b-2 border-transparent flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> AI提案
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 flex overflow-hidden">
 
                     <!-- Pane 1: カレンダー空き枠 -->
-                    <section class="w-72 bg-app-sidebar border-r border-app-border flex flex-col shrink-0 select-none">
+                    <section id="mpane-calendar" class="w-full md:w-72 bg-app-sidebar border-r border-app-border flex flex-col shrink-0 select-none md:mobile-pane-shown">
                         <div class="p-4 border-b border-app-border shrink-0 bg-white/40">
                             <h2 class="text-xs font-bold text-gray-800 flex items-center justify-between tracking-wider uppercase">
                                 <span>土日の空き枠チェッカー</span>
@@ -195,7 +231,7 @@
                     </section>
 
                     <!-- Pane 2: 新体験計画 & バケットリスト -->
-                    <section class="flex-grow bg-white flex flex-col overflow-hidden border-r border-app-border">
+                    <section id="mpane-bucket" class="mobile-pane-hidden flex-grow bg-white flex flex-col overflow-hidden border-r border-app-border">
                         <div class="flex-1 overflow-y-auto p-6 space-y-6">
                             <div class="bg-app-sidebar/40 border border-app-border rounded-2xl p-5 smooth-transition shadow-subtle" id="active-plan-card"></div>
 
@@ -273,7 +309,7 @@
                     </section>
 
                     <!-- Pane 3 & 4: AI提案 & リアルイベント -->
-                    <section class="w-80 bg-white flex flex-col shrink-0 overflow-y-auto border-l border-app-border divide-y divide-app-border">
+                    <section id="mpane-ai" class="mobile-pane-hidden w-full md:w-80 bg-white flex flex-col shrink-0 overflow-y-auto border-l border-app-border divide-y divide-app-border">
                         <div class="p-5 space-y-4 select-none">
                             <div class="flex justify-between items-center">
                                 <h3 class="text-[10px] font-bold text-app-textMuted tracking-wider uppercase">AI掛け算コンボ提案 (Pane 4)</h3>
@@ -294,6 +330,7 @@
                             <div class="space-y-3" id="event-feed-container"></div>
                         </div>
                     </section>
+                    </div><!-- end flex-1 flex overflow-hidden -->
                 </div>
 
                 <!-- B. Notion同期 / 設定 -->
@@ -392,7 +429,7 @@
                                 <div class="text-2xl font-black text-gray-800" id="achievement-stat-total">- XP</div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4" id="completed-items-grid"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="completed-items-grid"></div>
                     </div>
                 </div>
             </div>
@@ -1296,6 +1333,61 @@
         updateMetrics();
         gainXP(0);
     };
+
+    // ==========================================
+    // モバイル ペイン切り替え
+    // ==========================================
+    let currentMobilePane = 'calendar';
+
+    function switchMobilePane(pane) {
+        currentMobilePane = pane;
+        const panes = ['calendar', 'bucket', 'ai'];
+        panes.forEach(p => {
+            const el  = document.getElementById(`mpane-${p}`);
+            const tab = document.getElementById(`mpane-tab-${p}`);
+            if (!el || !tab) return;
+            if (p === pane) {
+                el.classList.remove('mobile-pane-hidden');
+                tab.classList.add('text-app-accent', 'border-app-accent');
+                tab.classList.remove('text-app-textMuted', 'border-transparent');
+            } else {
+                el.classList.add('mobile-pane-hidden');
+                tab.classList.remove('text-app-accent', 'border-app-accent');
+                tab.classList.add('text-app-textMuted', 'border-transparent');
+            }
+        });
+    }
     </script>
+
+    <!-- モバイル下部ナビゲーション -->
+    <nav class="mobile-only fixed bottom-0 left-0 right-0 bg-white border-t border-app-border z-50">
+        <div class="flex">
+            <button onclick="switchSubTab('dashboard'); switchMobilePane('calendar');" id="mobile-nav-dashboard"
+                    class="flex-1 py-3 flex flex-col items-center gap-1 text-app-accent">
+                <i class="fa-regular fa-calendar-days text-xl"></i>
+                <span class="text-[9px] font-bold">カレンダー</span>
+            </button>
+            <button onclick="switchSubTab('dashboard'); switchMobilePane('bucket');" id="mobile-nav-bucket"
+                    class="flex-1 py-3 flex flex-col items-center gap-1 text-app-textMuted">
+                <i class="fa-brands fa-notion text-xl"></i>
+                <span class="text-[9px] font-bold">バケットリスト</span>
+            </button>
+            <button onclick="switchSubTab('dashboard'); switchMobilePane('ai');" id="mobile-nav-ai"
+                    class="flex-1 py-3 flex flex-col items-center gap-1 text-app-textMuted">
+                <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                <span class="text-[9px] font-bold">AI提案</span>
+            </button>
+            <button onclick="switchSubTab('achievements');" id="mobile-nav-achievements"
+                    class="flex-1 py-3 flex flex-col items-center gap-1 text-app-textMuted">
+                <i class="fa-solid fa-trophy text-xl"></i>
+                <span class="text-[9px] font-bold">実績</span>
+            </button>
+            <button onclick="switchSubTab('notion-config');" id="mobile-nav-settings"
+                    class="flex-1 py-3 flex flex-col items-center gap-1 text-app-textMuted">
+                <i class="fa-solid fa-sliders text-xl"></i>
+                <span class="text-[9px] font-bold">設定</span>
+            </button>
+        </div>
+    </nav>
 </body>
 </html>
