@@ -981,7 +981,7 @@
         if (gemKey && gemKey.trim()) {
             try { proposal = await generateComboWithGemini(gemKey, slot, bucket, currentDifficulty, zones); }
             catch (e) {
-                showToast('Gemini API エラー。フォールバック提案を使用します。', false);
+                showToast(`Gemini APIエラー: ${e.message}`, false);
                 proposal = buildLocalCombo(slot, bucket, currentDifficulty, zones);
             }
         } else {
@@ -1053,6 +1053,27 @@
         };
     }
 
+    async function callGemini(apiKey, prompt, jsonMode = false) {
+        const models = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+        for (const model of models) {
+            const body = { contents: [{ parts: [{ text: prompt }] }] };
+            if (jsonMode) body.generationConfig = { responseMimeType: 'application/json' };
+            const res = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+                { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+            );
+            if (res.ok) {
+                const result = await res.json();
+                return result.candidates?.[0]?.content?.parts?.[0]?.text;
+            }
+            // 最後のモデルでも失敗したらエラー
+            if (model === models[models.length - 1]) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(`${res.status}: ${err.error?.message || 'API error'}`);
+            }
+        }
+    }
+
     async function generateComboWithGemini(apiKey, slot, bucketItem, difficulty, zones) {
         const prompt = `ひろしさんの新しい体験プランを提案してください。
 【条件】
@@ -1063,14 +1084,8 @@
 - 既存の趣味（コンフォートゾーン）: ${zones.join(', ')}
 【出力】JSON のみで返す: {"title":"...","desc":"...","budget":"...","time":"...","stars":4.5,"comfortAnalysis":"..."}`;
 
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: 'application/json' } }),
-        });
-        if (!res.ok) throw new Error('Gemini API error: ' + res.status);
-        const result = await res.json();
-        return JSON.parse(result.candidates?.[0]?.content?.parts?.[0]?.text);
+        const text = await callGemini(apiKey, prompt, true);
+        return JSON.parse(text);
     }
 
     // ==========================================
@@ -1133,22 +1148,12 @@
 ]`;
 
         try {
-            const res = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                }
-            );
-            const data = await res.json();
-            const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const raw = await callGemini(apiKey, prompt);
             const jsonMatch = raw.match(/\[[\s\S]*\]/);
             if (!jsonMatch) throw new Error('JSON not found');
             const events = JSON.parse(jsonMatch[0]);
             renderEventCards(events);
         } catch (e) {
-            // エラー時はモックにフォールバック
             renderEventCards(mockEvents);
         }
     }
