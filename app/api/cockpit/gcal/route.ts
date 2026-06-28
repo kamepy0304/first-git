@@ -23,7 +23,7 @@ function parseICalDate(val: string): Date | null {
 
 // iCal テキストをパースしてイベント配列を返す
 function parseICal(text: string) {
-  const events: { summary: string; start: Date; end: Date }[] = []
+  const events: { summary: string; start: Date; end: Date; allDay: boolean }[] = []
 
   // 行継続（スペース/タブ始まりの行を前の行に連結）
   const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
@@ -41,15 +41,16 @@ function parseICal(text: string) {
   let summary = ''
   let start: Date | null = null
   let end: Date | null = null
+  let allDay = false
 
   for (const line of lines) {
     if (line === 'BEGIN:VEVENT') {
-      inEvent = true; summary = ''; start = null; end = null
+      inEvent = true; summary = ''; start = null; end = null; allDay = false
       continue
     }
     if (line === 'END:VEVENT') {
       if (inEvent && start && end) {
-        events.push({ summary, start, end })
+        events.push({ summary, start, end, allDay })
       }
       inEvent = false
       continue
@@ -63,8 +64,11 @@ function parseICal(text: string) {
     const value = line.slice(colonIdx + 1).trim()
 
     if (key === 'SUMMARY') summary = value
-    if (key === 'DTSTART') start = parseICalDate(value)
-    if (key === 'DTEND')   end   = parseICalDate(value)
+    if (key === 'DTSTART') {
+      allDay = /^\d{8}$/.test(value)
+      start = parseICalDate(value)
+    }
+    if (key === 'DTEND') end = parseICalDate(value)
   }
 
   return events
@@ -110,11 +114,17 @@ export async function GET(request: Request) {
 
   const weekendEvents = allEvents
     .filter(e => e.start >= from && e.start <= twoMonthsLater)
-    .map(e => ({
-      summary: e.summary,
-      date: e.start.toISOString().split('T')[0],
-      dayOfWeek: e.start.getDay(), // 0=日, 6=土
-    }))
+    .map(e => {
+      const timeStr = e.allDay
+        ? null
+        : `${String(e.start.getHours()).padStart(2, '0')}:${String(e.start.getMinutes()).padStart(2, '0')}`
+      return {
+        summary: e.summary,
+        date: e.start.toISOString().split('T')[0],
+        time: timeStr,
+        dayOfWeek: e.start.getDay(),
+      }
+    })
 
   return NextResponse.json({ events: weekendEvents, total: allEvents.length })
 }

@@ -830,9 +830,12 @@
                            <span class="truncate">${slot.plannedActivity}</span>
                        </div>`
                     : slot.gcalSummary
-                    ? `<div class="mt-2.5 pt-2 border-t border-app-border flex items-center gap-1.5 text-[10px] text-blue-500 font-medium">
-                           <i class="fa-brands fa-google text-[9px]"></i>
-                           <span class="truncate">${slot.gcalSummary}</span>
+                    ? `<div class="mt-2.5 pt-2 border-t border-app-border space-y-1">
+                           ${slot.gcalSummary.map(ev => `
+                           <div class="flex items-start gap-1.5 text-[10px] text-blue-600 font-medium">
+                               <i class="fa-brands fa-google text-[9px] mt-0.5 shrink-0"></i>
+                               <span>${ev}</span>
+                           </div>`).join('')}
                        </div>`
                     : `<div class="mt-2.5 text-[9px] text-gray-400 italic">空き枠アサイン可能</div>`
                 }
@@ -1333,9 +1336,8 @@
             for (const slot of calendarSlots) {
                 const dayEvents = data.events.filter(e => e.date === slot.isoDate);
                 if (dayEvents.length > 0 && !slot.plannedActivity) {
-                    const summary = dayEvents.map(e => e.summary).join(' / ');
                     slot.activeState = `予定あり`;
-                    slot.gcalSummary = summary;
+                    slot.gcalSummary = dayEvents.map(e => e.time ? `${e.time} ${e.summary}` : e.summary);
                     matched++;
                     await DB.saveCalendarSlot(slot.id, slot.plannedActivity, slot.activeState);
                 }
