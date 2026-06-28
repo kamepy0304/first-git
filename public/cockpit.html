@@ -41,7 +41,7 @@
         ::-webkit-scrollbar-thumb:hover { background: #C27D38; }
         .smooth-transition { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
         .interactive-card { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-        .interactive-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(194,125,56,0.06); }
+        .interactive-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(194,125,56,0.10), 0 2px 6px rgba(0,0,0,0.04); }
         .interactive-card:active { transform: translateY(1px); }
         @keyframes rattle {
             0%,100% { transform: translate(0,0) rotate(0deg); }
@@ -53,7 +53,208 @@
         .notion-sync-rattle { animation: rattle 0.4s ease-in-out infinite; }
         @keyframes pulse-light { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
         .pulse-indicator { animation: pulse-light 1.5s infinite; }
-        .timeline-node { width: 22px; height: 22px; }
+
+        /* ===== 1. TIMELINE NODE ===== */
+        .timeline-node {
+            width: 24px;
+            height: 24px;
+            box-shadow: 0 0 0 3px #F4F3EF;
+            transition: all 0.2s ease;
+        }
+        .timeline-node:hover { transform: scale(1.15); }
+        .timeline-node-checked {
+            background: linear-gradient(135deg, #C27D38, #E09550) !important;
+            color: white !important;
+            box-shadow: 0 0 0 3px #F4F3EF, 0 2px 8px rgba(194,125,56,0.4) !important;
+        }
+
+        /* ===== 2. SIDEBAR ===== */
+        .nav-active-item {
+            background: linear-gradient(90deg, rgba(194,125,56,0.11) 0%, rgba(234,232,226,0.5) 100%) !important;
+            border-left: 2.5px solid #C27D38 !important;
+            color: #A86628 !important;
+            font-weight: 700 !important;
+        }
+        .nav-base-item {
+            border-left: 2.5px solid transparent;
+            transition: all 0.18s ease;
+        }
+        .nav-base-item:hover {
+            background: rgba(194,125,56,0.05);
+            border-left-color: rgba(194,125,56,0.3);
+        }
+        .sidebar-section-label {
+            font-size: 9.5px;
+            font-weight: 800;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: #A8A5A0;
+        }
+
+        /* ===== 3. HEADER ===== */
+        header {
+            background: rgba(255,255,255,0.97) !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.025) !important;
+        }
+        .breadcrumb-root {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #A8A5A0;
+        }
+        .breadcrumb-current {
+            font-size: 13px;
+            font-weight: 700;
+            color: #2C2B29;
+        }
+
+        /* ===== 4. CARDS ===== */
+        .card-polished {
+            background: #ffffff;
+            border: 1px solid #ECE9E2;
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 3px 12px rgba(194,125,56,0.04);
+            transition: box-shadow 0.2s ease, transform 0.18s ease, border-color 0.2s ease;
+        }
+        .card-polished:hover {
+            box-shadow: 0 6px 20px rgba(194,125,56,0.09), 0 2px 5px rgba(0,0,0,0.04);
+            border-color: #D4BFA0;
+            transform: translateY(-1px);
+        }
+
+        /* ===== 5. TIMELINE ITEM CARDS ===== */
+        .bucket-item-card {
+            background: #ffffff;
+            border: 1px solid #ECE9E2;
+            border-radius: 12px;
+            padding: 13px 15px;
+            transition: all 0.2s ease;
+        }
+        .bucket-item-card:hover {
+            border-color: #D0BFA4;
+            box-shadow: 0 4px 14px rgba(194,125,56,0.07);
+        }
+        .bucket-item-card.is-done {
+            background: linear-gradient(135deg, #FDFAF6 0%, #FAF5EE 100%);
+            border-color: rgba(194,125,56,0.2);
+        }
+        .bucket-item-card.is-selected-combo {
+            border-color: #C27D38;
+            box-shadow: 0 0 0 2.5px rgba(194,125,56,0.15), 0 4px 14px rgba(194,125,56,0.08);
+        }
+        .tag-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            border: 1px solid;
+        }
+
+        /* ===== 6. METRIC CARDS ===== */
+        .metric-tile {
+            background: #ffffff;
+            border: 1px solid #ECE9E2;
+            border-radius: 14px;
+            padding: 14px 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 2px 8px rgba(0,0,0,0.03);
+            transition: all 0.2s ease;
+        }
+        .metric-tile:hover {
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+            transform: translateY(-1px);
+        }
+        .metric-tile .metric-num {
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .metric-tile .metric-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+        }
+
+        /* ===== 7. SECTION HEADINGS ===== */
+        .section-head {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: #8E8C84;
+        }
+
+        /* ===== 8. EMPTY STATE ===== */
+        .empty-state-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 44px 24px;
+            text-align: center;
+        }
+        .empty-icon-box {
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #FEF3E6, #FAE4C0);
+            border: 1px solid rgba(194,125,56,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #C27D38;
+            box-shadow: 0 4px 14px rgba(194,125,56,0.12);
+            margin: 0 auto;
+        }
+
+        /* ===== 9. APP LOGO ===== */
+        .app-logo-mark {
+            background: linear-gradient(135deg, #B8711E 0%, #D4904C 100%);
+            box-shadow: 0 3px 10px rgba(194,125,56,0.38), inset 0 1px 0 rgba(255,255,255,0.18);
+        }
+
+        /* ===== 10. XP BAR ===== */
+        #xp-bar {
+            background: linear-gradient(90deg, #C27D38, #E09A50);
+            box-shadow: 0 0 8px rgba(194,125,56,0.4);
+        }
+
+        /* ===== 11. TOAST ===== */
+        #toast {
+            background: linear-gradient(135deg, #1C1B18, #2C2B27) !important;
+            border: 1px solid rgba(255,255,255,0.07) !important;
+        }
+
+        /* ===== 12. CALENDAR SLOT CARD ===== */
+        .slot-card {
+            background: #ffffff;
+            border: 1px solid #ECE9E2;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+        .slot-card:hover { border-color: #D4BFA0; box-shadow: 0 4px 12px rgba(194,125,56,0.08); }
+        .slot-card.slot-active {
+            border-color: #C27D38;
+            background: linear-gradient(135deg, #FFFBF6 0%, #FEF6EC 100%);
+            box-shadow: 0 0 0 2px rgba(194,125,56,0.16), 0 4px 14px rgba(194,125,56,0.09);
+            transform: translateX(2px);
+        }
+
+        /* ===== 13. AI PANEL ===== */
+        #ai-proposal-box {
+            background: linear-gradient(135deg, rgba(254,243,230,0.6) 0%, rgba(252,237,212,0.4) 100%) !important;
+            border: 1px solid rgba(194,125,56,0.15) !important;
+        }
+
         /* モバイル対応 */
         @media (max-width: 767px) {
             .mobile-only { display: flex !important; }
@@ -84,54 +285,62 @@
     <div class="flex flex-1 overflow-hidden h-full">
 
         <!-- 左サイドバー (PC only) -->
-        <aside class="w-64 bg-app-sidebar border-r border-app-border hidden md:flex flex-col justify-between shrink-0 select-none z-20">
-            <div class="p-5">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-9 h-9 bg-app-accent rounded-xl flex items-center justify-center text-white font-bold shadow-md">
-                        <i class="fa-solid fa-compass-drafting text-lg"></i>
+        <aside class="w-64 border-r border-app-border hidden md:flex flex-col justify-between shrink-0 select-none z-20" style="background:linear-gradient(180deg,#FDFCFA 0%,#F7F5F1 60%,#EFEBE3 100%);">
+            <div class="px-4 pt-5 pb-4">
+                <!-- ロゴ -->
+                <div class="flex items-center gap-3 mb-7">
+                    <div class="w-9 h-9 app-logo-mark rounded-xl flex items-center justify-center text-white font-bold shrink-0">
+                        <i class="fa-solid fa-compass-drafting text-base"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-sm tracking-wider text-gray-800">体験創造コックピット</h1>
-                        <p class="text-[10px] text-app-textMuted font-mono">ULTIMATE EDITION</p>
+                        <h1 class="font-bold text-[13px] tracking-tight text-gray-800 leading-tight">体験創造コックピット</h1>
+                        <p class="text-[9px] font-mono tracking-widest mt-0.5" style="color:#C27D38;opacity:0.7;">ULTIMATE EDITION</p>
                     </div>
                 </div>
-                <div class="space-y-6">
+
+                <div class="space-y-5">
+                    <!-- 企画・探求 -->
                     <div>
-                        <div class="flex justify-between items-center text-[10px] font-bold text-app-textMuted tracking-wider mb-2 uppercase">
-                            <span>企画・探求</span>
-                            <span class="pulse-indicator w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <div class="flex justify-between items-center mb-2 px-1">
+                            <span class="sidebar-section-label">企画・探求</span>
+                            <span class="pulse-indicator w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         </div>
-                        <nav class="space-y-1">
+                        <nav class="space-y-0.5">
                             <a href="#" onclick="switchSubTab('dashboard'); return false;" id="nav-dashboard"
-                               class="flex justify-between items-center px-3 py-2.5 text-xs font-semibold bg-app-activeBg text-app-accent rounded-lg smooth-transition">
+                               class="nav-active-item nav-base-item flex justify-between items-center pl-3 pr-2.5 py-2.5 text-xs rounded-r-lg smooth-transition">
                                 <span class="flex items-center gap-2.5">
-                                    <i class="fa-regular fa-calendar-days text-app-accent text-sm"></i>
+                                    <i class="fa-regular fa-calendar-days text-app-accent w-4 text-center text-sm"></i>
                                     <span>週末の空き枠を探す</span>
                                 </span>
-                                <span class="text-[10px] bg-amber-100 text-app-accent px-1.5 py-0.5 rounded-full font-mono font-bold" id="slot-count-badge">-</span>
+                                <span class="text-[9px] bg-amber-100 text-app-accent px-1.5 py-0.5 rounded-full font-mono font-bold shrink-0" id="slot-count-badge">-</span>
                             </a>
                             <a href="#" onclick="switchSubTab('notion-config'); return false;" id="nav-notion"
-                               class="flex justify-between items-center px-3 py-2.5 text-xs font-medium text-app-textMuted hover:bg-gray-100 rounded-lg smooth-transition">
+                               class="nav-base-item flex justify-between items-center pl-3 pr-2.5 py-2.5 text-xs font-medium text-app-textMuted rounded-r-lg smooth-transition">
                                 <span class="flex items-center gap-2.5">
-                                    <i class="fa-solid fa-link text-gray-400 text-sm"></i>
+                                    <i class="fa-solid fa-link text-gray-400 w-4 text-center text-sm"></i>
                                     <span>Notion同期 / 設定</span>
                                 </span>
-                                <span id="notion-api-status" class="w-2 h-2 rounded-full bg-red-400"></span>
+                                <span id="notion-api-status" class="w-2 h-2 rounded-full bg-red-400 shrink-0"></span>
                             </a>
                         </nav>
                     </div>
+
+                    <!-- 区切り線 -->
+                    <div class="mx-1 h-px" style="background:linear-gradient(90deg,transparent,#E0DDD5,transparent)"></div>
+
+                    <!-- 実績・ログ -->
                     <div>
-                        <div class="flex justify-between items-center text-[10px] font-bold text-app-textMuted tracking-wider mb-2 uppercase">
-                            <span>実績・ログ</span>
+                        <div class="flex justify-between items-center mb-2 px-1">
+                            <span class="sidebar-section-label">実績・ログ</span>
                         </div>
-                        <nav class="space-y-1">
+                        <nav class="space-y-0.5">
                             <a href="#" onclick="switchSubTab('achievements'); return false;" id="nav-achievements"
-                               class="flex justify-between items-center px-3 py-2.5 text-xs font-medium text-app-textMuted hover:bg-gray-100 rounded-lg smooth-transition">
+                               class="nav-base-item flex justify-between items-center pl-3 pr-2.5 py-2.5 text-xs font-medium text-app-textMuted rounded-r-lg smooth-transition">
                                 <span class="flex items-center gap-2.5">
-                                    <i class="fa-solid fa-trophy text-gray-400 text-sm"></i>
+                                    <i class="fa-solid fa-trophy text-gray-400 w-4 text-center text-sm"></i>
                                     <span>達成した新しい体験</span>
                                 </span>
-                                <span class="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full font-mono" id="completed-count-badge">-</span>
+                                <span class="text-[9px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full font-mono font-bold shrink-0" id="completed-count-badge">-</span>
                             </a>
                         </nav>
                     </div>
@@ -139,27 +348,27 @@
             </div>
 
             <!-- フッタープロファイル -->
-            <div class="p-4 border-t border-app-border bg-white/60">
-                <div class="flex items-center gap-3 mb-2.5">
-                    <div class="relative">
-                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-600 to-amber-300 text-white flex items-center justify-center font-bold text-sm shadow-sm">ひ</div>
-                        <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-app-accent text-white rounded-full flex items-center justify-center text-[8px] font-bold border border-white">Lv</span>
+            <div class="px-4 py-4 border-t border-app-border" style="background:rgba(255,255,255,0.55);backdrop-filter:blur(8px);">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="relative shrink-0">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-700 to-amber-300 text-white flex items-center justify-center font-bold text-sm shadow-md">ひ</div>
+                        <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-app-accent text-white rounded-full flex items-center justify-center text-[8px] font-black border-2 border-white shadow-sm">Lv</span>
                     </div>
                     <div class="flex-grow min-w-0">
-                        <div class="flex justify-between items-center">
+                        <div class="flex justify-between items-baseline">
                             <p class="text-xs font-bold text-gray-800">ひろし</p>
-                            <span class="text-[10px] text-app-accent font-bold" id="user-level-badge">Lv.1</span>
+                            <span class="text-[10px] font-bold" style="color:#C27D38;" id="user-level-badge">Lv.1</span>
                         </div>
-                        <p class="text-[9px] text-app-textMuted truncate">コンフォートゾーン突破中</p>
+                        <p class="text-[9px] text-app-textMuted truncate mt-0.5">コンフォートゾーン突破中</p>
                     </div>
                 </div>
-                <div class="space-y-1">
+                <div class="space-y-1.5">
                     <div class="flex justify-between items-center text-[8px] text-app-textMuted">
-                        <span>体験XP: <strong id="xp-text">1400 / 2000</strong></span>
-                        <span id="xp-percent">70%</span>
+                        <span>体験XP: <strong id="xp-text" class="text-gray-600">1400 / 2000</strong></span>
+                        <span id="xp-percent" class="font-bold" style="color:#C27D38;">70%</span>
                     </div>
-                    <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                        <div id="xp-bar" class="bg-app-accent h-full smooth-transition" style="width: 70%"></div>
+                    <div class="w-full bg-gray-200/70 h-2 rounded-full overflow-hidden">
+                        <div id="xp-bar" class="h-full smooth-transition rounded-full" style="width:70%"></div>
                     </div>
                 </div>
             </div>
@@ -167,29 +376,31 @@
 
         <!-- メインコンテンツ -->
         <main class="flex-1 flex flex-col overflow-hidden">
-            <header class="bg-white border-b border-app-border px-4 md:px-6 py-3 md:py-4 flex justify-between items-center shrink-0 z-10 shadow-sm">
-                <div class="flex items-center gap-2 text-xs text-app-textMuted">
+            <header class="border-b border-app-border px-4 md:px-6 py-3 md:py-3.5 flex justify-between items-center shrink-0 z-10">
+                <div class="flex items-center gap-2.5">
                     <!-- モバイル: アプリ名 -->
                     <div class="flex items-center gap-2 md:hidden">
-                        <div class="w-7 h-7 bg-app-accent rounded-lg flex items-center justify-center text-white">
+                        <div class="w-7 h-7 app-logo-mark rounded-lg flex items-center justify-center text-white">
                             <i class="fa-solid fa-compass-drafting text-sm"></i>
                         </div>
                         <span class="font-bold text-gray-800 text-sm">体験創造コックピット</span>
                     </div>
                     <!-- PC: パンくず -->
-                    <span class="hidden md:inline">体験管理コックピット</span>
-                    <i class="fa-solid fa-chevron-right text-[9px] text-gray-300 hidden md:inline"></i>
-                    <span class="text-gray-800 font-semibold hidden md:inline" id="header-selected-date">6月6日 (土) の計画</span>
+                    <span class="breadcrumb-root hidden md:inline">体験管理</span>
+                    <i class="fa-solid fa-chevron-right text-[8px] hidden md:inline" style="color:#D8D6CE;"></i>
+                    <span class="breadcrumb-current hidden md:inline" id="header-selected-date">6月6日 (土) の計画</span>
                 </div>
-                <div class="flex items-center gap-3 md:gap-5">
-                    <span id="save-indicator" class="text-[10px] text-gray-400 flex items-center gap-1 opacity-0 transition-opacity">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> <span id="save-indicator-text">保存中...</span>
+                <div class="flex items-center gap-3 md:gap-4">
+                    <span id="save-indicator" class="text-[10px] text-gray-400 flex items-center gap-1.5 opacity-0 transition-opacity">
+                        <i class="fa-solid fa-cloud-arrow-up text-[11px]"></i> <span id="save-indicator-text">保存中...</span>
                     </span>
-                    <button onclick="resetCockpit()" class="hidden md:flex text-xs text-app-accent hover:text-amber-800 items-center gap-1.5 font-medium transition-colors">
-                        <i class="fa-solid fa-rotate-left text-[11px]"></i> 初期データに戻す
+                    <button onclick="resetCockpit()" class="hidden md:flex items-center gap-1.5 text-[11px] font-medium smooth-transition px-3 py-1.5 rounded-lg border border-transparent hover:border-app-border hover:bg-gray-50" style="color:#C27D38;">
+                        <i class="fa-solid fa-rotate-left text-[10px]"></i> 初期データに戻す
                     </button>
-                    <div class="h-4 w-[1px] bg-app-border hidden md:block"></div>
-                    <i class="fa-solid fa-sliders text-app-textMuted hover:text-gray-800 cursor-pointer smooth-transition" onclick="switchSubTab('notion-config')"></i>
+                    <div class="h-4 w-px bg-app-border hidden md:block"></div>
+                    <button onclick="switchSubTab('notion-config')" class="w-8 h-8 rounded-lg flex items-center justify-center text-app-textMuted hover:text-gray-800 hover:bg-gray-100 smooth-transition">
+                        <i class="fa-solid fa-sliders text-sm"></i>
+                    </button>
                 </div>
             </header>
 
@@ -219,61 +430,67 @@
                     <div class="flex-1 flex overflow-hidden">
 
                     <!-- Pane 1: カレンダー空き枠 -->
-                    <section id="mpane-calendar" class="w-full md:w-72 bg-app-sidebar border-r border-app-border flex flex-col shrink-0 select-none md:mobile-pane-shown">
-                        <div class="p-4 border-b border-app-border shrink-0 bg-white/40">
-                            <h2 class="text-xs font-bold text-gray-800 flex items-center justify-between tracking-wider uppercase">
-                                <span>土日の空き枠チェッカー</span>
-                                <span class="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-full font-semibold">直近1ヶ月</span>
-                            </h2>
-                            <p class="text-[10px] text-app-textMuted mt-1 leading-normal">空いている日をクリックして、中央のバケットや右のAI提案とシームレスに連動します。</p>
+                    <section id="mpane-calendar" class="w-full md:w-72 border-r border-app-border flex flex-col shrink-0 select-none md:mobile-pane-shown" style="background:linear-gradient(180deg,#FDFCFA 0%,#F6F3EE 100%);">
+                        <div class="px-4 py-3.5 border-b border-app-border shrink-0" style="background:rgba(255,255,255,0.5);backdrop-filter:blur(8px);">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <h2 class="section-head flex items-center gap-1.5">
+                                    <i class="fa-regular fa-calendar-days" style="color:#C27D38;font-size:11px;"></i>
+                                    土日の空き枠
+                                </h2>
+                                <span class="tag-pill" style="background:#ECFDF5;color:#059669;border-color:#A7F3D0;">直近2ヶ月</span>
+                            </div>
+                            <p class="text-[10px] text-app-textMuted leading-relaxed">空いている日をクリックして計画を立てましょう。</p>
                         </div>
-                        <div class="flex-1 overflow-y-auto p-3 space-y-2.5" id="slot-list-container"></div>
+                        <div class="flex-1 overflow-y-auto p-3 space-y-2" id="slot-list-container"></div>
                     </section>
 
                     <!-- Pane 2: 新体験計画 & バケットリスト -->
                     <section id="mpane-bucket" class="mobile-pane-hidden flex-grow bg-white flex flex-col overflow-hidden border-r border-app-border">
                         <div class="flex-1 overflow-y-auto p-6 space-y-6">
-                            <div class="bg-app-sidebar/40 border border-app-border rounded-2xl p-5 smooth-transition shadow-subtle" id="active-plan-card"></div>
+                            <div class="rounded-2xl p-5 smooth-transition" id="active-plan-card" style="background:linear-gradient(135deg,#FDFAF6 0%,#FAF5EE 100%);border:1px solid rgba(194,125,56,0.15);box-shadow:0 2px 12px rgba(194,125,56,0.06);"></div>
 
                             <div class="grid grid-cols-3 gap-3">
-                                <div class="bg-white border border-app-border rounded-xl p-3 flex items-center justify-between shadow-subtle">
-                                    <div class="space-y-0.5">
-                                        <span class="text-[10px] font-bold text-app-textMuted block">Notion ストック</span>
-                                        <span class="text-lg font-bold text-app-notion" id="metric-stock">-</span>
+                                <div class="metric-tile flex items-center justify-between">
+                                    <div class="space-y-1">
+                                        <span class="text-[9px] font-bold text-app-textMuted block tracking-wider uppercase">ストック</span>
+                                        <span class="metric-num text-app-notion" id="metric-stock">-</span>
                                     </div>
-                                    <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fa-brands fa-notion"></i></div>
+                                    <div class="metric-icon bg-gray-100 flex items-center justify-center text-gray-500 text-sm"><i class="fa-brands fa-notion"></i></div>
                                 </div>
-                                <div class="bg-white border border-app-border rounded-xl p-3 flex items-center justify-between shadow-subtle">
-                                    <div class="space-y-0.5">
-                                        <span class="text-[10px] font-bold text-app-textMuted block">今月のアサイン中</span>
-                                        <span class="text-lg font-bold text-app-accent" id="metric-assigned">-</span>
+                                <div class="metric-tile flex items-center justify-between">
+                                    <div class="space-y-1">
+                                        <span class="text-[9px] font-bold text-app-textMuted block tracking-wider uppercase">アサイン</span>
+                                        <span class="metric-num" style="color:#C27D38;" id="metric-assigned">-</span>
                                     </div>
-                                    <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center text-app-accent"><i class="fa-solid fa-calendar-check"></i></div>
+                                    <div class="metric-icon flex items-center justify-center text-sm" style="background:rgba(194,125,56,0.08);color:#C27D38;"><i class="fa-solid fa-calendar-check"></i></div>
                                 </div>
-                                <div class="bg-white border border-app-border rounded-xl p-3 flex items-center justify-between shadow-subtle">
-                                    <div class="space-y-0.5">
-                                        <span class="text-[10px] font-bold text-app-textMuted block">突破した体験</span>
-                                        <span class="text-lg font-bold text-emerald-600" id="metric-completed">-</span>
+                                <div class="metric-tile flex items-center justify-between">
+                                    <div class="space-y-1">
+                                        <span class="text-[9px] font-bold text-app-textMuted block tracking-wider uppercase">突破済み</span>
+                                        <span class="metric-num text-emerald-600" id="metric-completed">-</span>
                                     </div>
-                                    <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600"><i class="fa-solid fa-award"></i></div>
+                                    <div class="metric-icon bg-emerald-50 flex items-center justify-center text-emerald-600 text-sm"><i class="fa-solid fa-award"></i></div>
                                 </div>
                             </div>
 
                             <div class="space-y-4">
-                                <div class="flex justify-between items-center border-b border-app-border pb-2.5">
-                                    <h3 class="text-xs font-bold text-gray-800 flex items-center gap-2 tracking-wider uppercase">
-                                        <i class="fa-brands fa-notion text-app-notion"></i>
-                                        <span>Notion同期 バケットリスト (過去ストック)</span>
-                                    </h3>
+                                <div class="flex justify-between items-center pb-3" style="border-bottom:1px solid #ECE9E2;">
+                                    <div>
+                                        <h3 class="section-head flex items-center gap-1.5">
+                                            <i class="fa-brands fa-notion" style="color:#37352F;font-size:12px;"></i>
+                                            バケットリスト
+                                        </h3>
+                                        <p class="text-[9px] text-app-textMuted mt-0.5">Notion同期ストック — 体験をクリックでAIコンボ生成</p>
+                                    </div>
                                     <div class="flex items-center gap-2">
                                         <button onclick="simulateNotionSync()" id="sync-button"
-                                                class="text-[11px] border border-app-border hover:border-app-accent bg-white text-gray-700 px-3 py-1.5 rounded-lg smooth-transition flex items-center gap-1.5">
-                                            <i class="fa-solid fa-arrows-rotate" id="sync-icon"></i>
+                                                class="text-[10px] border border-app-border hover:border-app-accent bg-white text-gray-600 px-2.5 py-1.5 rounded-lg smooth-transition flex items-center gap-1.5 font-medium">
+                                            <i class="fa-solid fa-arrows-rotate text-[10px]" id="sync-icon"></i>
                                             <span id="sync-btn-text">Notionと同期</span>
                                         </button>
                                         <button onclick="toggleAddBucketForm()"
-                                                class="text-[11px] bg-app-accent text-white px-3 py-1.5 rounded-lg hover:bg-app-accentHover smooth-transition flex items-center gap-1">
-                                            <i class="fa-solid fa-plus"></i> 追加
+                                                class="text-[10px] text-white px-3 py-1.5 rounded-lg smooth-transition flex items-center gap-1 font-bold shadow-sm" style="background:linear-gradient(135deg,#C27D38,#D4894A);">
+                                            <i class="fa-solid fa-plus text-[10px]"></i> 追加
                                         </button>
                                     </div>
                                 </div>
@@ -310,22 +527,34 @@
 
                     <!-- Pane 3 & 4: AI提案 & リアルイベント -->
                     <section id="mpane-ai" class="mobile-pane-hidden w-full md:w-80 bg-white flex flex-col shrink-0 overflow-y-auto border-l border-app-border divide-y divide-app-border">
-                        <div class="p-5 space-y-4 select-none">
+                        <div class="p-5 space-y-3.5 select-none">
                             <div class="flex justify-between items-center">
-                                <h3 class="text-[10px] font-bold text-app-textMuted tracking-wider uppercase">AI掛け算コンボ提案 (Pane 4)</h3>
-                                <div class="flex bg-gray-100 p-0.5 rounded-lg text-[9px] font-semibold">
+                                <div>
+                                    <h3 class="section-head flex items-center gap-1.5">
+                                        <i class="fa-solid fa-wand-magic-sparkles" style="color:#C27D38;font-size:10px;"></i>
+                                        AI 掛け算コンボ
+                                    </h3>
+                                    <p class="text-[9px] text-app-textMuted mt-0.5">体験×日程の最適プランを自動生成</p>
+                                </div>
+                                <div class="flex bg-gray-100 p-0.5 rounded-lg text-[9px] font-semibold gap-0.5">
                                     <button onclick="changeDifficulty('easy')"   id="diff-easy"   class="px-2.5 py-1 rounded-md smooth-transition text-app-textMuted">Easy</button>
                                     <button onclick="changeDifficulty('medium')" id="diff-medium" class="px-2.5 py-1 rounded-md bg-white text-gray-800 shadow-sm smooth-transition font-bold">Medium</button>
                                     <button onclick="changeDifficulty('hard')"   id="diff-hard"   class="px-2.5 py-1 rounded-md smooth-transition text-app-textMuted">Hard</button>
                                 </div>
                             </div>
-                            <div class="bg-amber-50/40 border border-amber-100/60 rounded-2xl p-4 space-y-4 relative" id="ai-proposal-box"></div>
+                            <div class="rounded-2xl p-4 space-y-4 relative" id="ai-proposal-box"></div>
                         </div>
 
-                        <div class="p-5 space-y-4">
+                        <div class="p-5 space-y-3.5">
                             <div class="flex justify-between items-center select-none">
-                                <h3 class="text-[10px] font-bold text-app-textMuted tracking-wider uppercase">周辺リアルイベント情報 (Pane 3)</h3>
-                                <span class="text-[9px] font-mono text-app-accent bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 font-bold uppercase">Web Radar</span>
+                                <div>
+                                    <h3 class="section-head flex items-center gap-1.5">
+                                        <i class="fa-solid fa-location-dot" style="color:#C27D38;font-size:10px;"></i>
+                                        周辺リアルイベント
+                                    </h3>
+                                    <p class="text-[9px] text-app-textMuted mt-0.5">首都圏の体験型イベント情報</p>
+                                </div>
+                                <span class="text-[8px] font-mono font-bold px-1.5 py-0.5 rounded border" style="color:#C27D38;background:rgba(194,125,56,0.06);border-color:rgba(194,125,56,0.2);letter-spacing:0.08em;">WEB RADAR</span>
                             </div>
                             <div class="space-y-3" id="event-feed-container"></div>
                         </div>
@@ -336,12 +565,14 @@
                 <!-- B. Notion同期 / 設定 -->
                 <div id="tab-notion-config" class="hidden flex-grow flex overflow-y-auto bg-white p-8 w-full">
                     <div class="max-w-2xl mx-auto w-full space-y-8 text-left">
-                        <div>
-                            <h2 class="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-                                <i class="fa-brands fa-notion text-app-notion"></i>
-                                <span>Notion API ＆ 設定管理</span>
-                            </h2>
-                            <p class="text-xs text-app-textMuted leading-relaxed">
+                        <div class="pb-6" style="border-bottom:1px solid #ECE9E2;">
+                            <div class="flex items-center gap-2.5 mb-2">
+                                <div class="w-8 h-8 rounded-xl bg-gray-900 flex items-center justify-center text-white text-sm shrink-0">
+                                    <i class="fa-brands fa-notion"></i>
+                                </div>
+                                <h2 class="text-xl font-black text-gray-800 tracking-tight">Notion API ＆ 設定管理</h2>
+                            </div>
+                            <p class="text-xs text-app-textMuted leading-relaxed ml-10">
                                 バケットリストとカレンダー割当は Supabase データベースに自動保存されます。リロードしても別端末でも、データは維持されます。
                             </p>
                         </div>
@@ -434,19 +665,21 @@
                 </div>
 
                 <!-- C. 達成した新しい体験 -->
-                <div id="tab-achievements" class="hidden flex-grow flex overflow-y-auto bg-white p-8 w-full">
+                <div id="tab-achievements" class="hidden flex-grow flex overflow-y-auto p-8 w-full" style="background:linear-gradient(180deg,#FDFCFA,#F8F5F0);">
                     <div class="max-w-4xl mx-auto w-full space-y-6 text-left">
-                        <div class="flex justify-between items-center">
+                        <div class="flex justify-between items-end pb-4" style="border-bottom:1px solid #ECE9E2;">
                             <div>
-                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                                    <i class="fa-solid fa-trophy text-yellow-500"></i>
-                                    <span>達成した体験ログ</span>
-                                </h2>
-                                <p class="text-xs text-app-textMuted">ひろしさんがコンフォートゾーンを破って獲得した、人生の原体験ログです。</p>
+                                <div class="flex items-center gap-2.5 mb-1.5">
+                                    <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);">
+                                        <i class="fa-solid fa-trophy text-yellow-500 text-base"></i>
+                                    </div>
+                                    <h2 class="text-xl font-black text-gray-800 tracking-tight">達成した体験ログ</h2>
+                                </div>
+                                <p class="text-xs text-app-textMuted ml-11">ひろしさんがコンフォートゾーンを突破して獲得した、人生の原体験ログです。</p>
                             </div>
-                            <div class="text-right">
-                                <span class="text-xs font-bold text-app-accent">累計突破ボーナス:</span>
-                                <div class="text-2xl font-black text-gray-800" id="achievement-stat-total">- XP</div>
+                            <div class="text-right shrink-0">
+                                <p class="text-[9px] font-bold tracking-widest uppercase mb-0.5" style="color:#A8A5A0;">累計突破ボーナス</p>
+                                <div class="text-2xl font-black" style="color:#C27D38;" id="achievement-stat-total">- XP</div>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="completed-items-grid"></div>
@@ -457,9 +690,9 @@
     </div>
 
     <!-- トースト通知 -->
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-5 py-3 rounded-xl shadow-lifted flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 z-50 pointer-events-none">
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 text-white text-xs px-5 py-3 rounded-2xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 z-50 pointer-events-none" style="background:linear-gradient(135deg,#1C1B18,#2C2B27);border:1px solid rgba(255,255,255,0.08);box-shadow:0 8px 32px rgba(0,0,0,0.25),0 2px 8px rgba(0,0,0,0.15);">
         <i class="fa-solid fa-circle-check text-emerald-400 text-sm" id="toast-icon"></i>
-        <span id="toast-message" class="font-medium">保存しました。</span>
+        <span id="toast-message" class="font-semibold tracking-tight">保存しました。</span>
     </div>
 
     <script>
@@ -787,11 +1020,13 @@
             if (t === tabId) {
                 el.classList.remove('hidden');
                 if (t === 'dashboard') el.classList.add('flex');
-                navEl.className = 'flex justify-between items-center px-3 py-2.5 text-xs font-semibold bg-app-activeBg text-app-accent rounded-lg smooth-transition';
+                navEl.classList.add('nav-active-item');
+                navEl.classList.remove('text-app-textMuted');
             } else {
                 el.classList.add('hidden');
                 el.classList.remove('flex');
-                navEl.className = 'flex justify-between items-center px-3 py-2.5 text-xs font-medium text-app-textMuted hover:bg-gray-100 rounded-lg smooth-transition';
+                navEl.classList.remove('nav-active-item');
+                navEl.classList.add('text-app-textMuted');
             }
         });
         if (tabId === 'achievements')   renderAchievements();
