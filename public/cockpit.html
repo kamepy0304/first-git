@@ -388,6 +388,26 @@
                                                class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-app-border rounded-lg focus:outline-none focus:border-app-accent">
                                     </div>
                                 </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-app-textMuted mb-1">
+                                        <i class="fa-brands fa-google text-blue-500 mr-1"></i>
+                                        Google カレンダー iCal URL
+                                        <span class="ml-1 text-app-textMuted font-normal">（プライベートURL）</span>
+                                    </label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-app-textMuted"><i class="fa-solid fa-calendar"></i></span>
+                                        <input type="text" id="input-gcal-ical" placeholder="https://calendar.google.com/calendar/ical/..."
+                                               class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-app-border rounded-lg focus:outline-none focus:border-app-accent font-mono">
+                                    </div>
+                                    <p class="text-[9px] text-app-textMuted mt-1 leading-relaxed">
+                                        Googleカレンダー → 設定 → カレンダーの設定 →「カレンダーの統合」→「プライベートiCal形式URL」をコピーして貼り付け。
+                                    </p>
+                                    <button onclick="syncGoogleCalendar()" id="gcal-sync-btn"
+                                            class="mt-2 text-[11px] border border-blue-200 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg hover:bg-blue-100 smooth-transition flex items-center gap-1.5">
+                                        <i class="fa-solid fa-arrows-rotate" id="gcal-sync-icon"></i>
+                                        <span id="gcal-sync-text">Googleカレンダーを同期</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -788,6 +808,11 @@
                     ? `<div class="mt-2.5 pt-2 border-t border-app-border flex items-center gap-1.5 text-[10px] text-app-accent font-bold">
                            <i class="fa-solid fa-flag text-[9px]"></i>
                            <span class="truncate">${slot.plannedActivity}</span>
+                       </div>`
+                    : slot.gcalSummary
+                    ? `<div class="mt-2.5 pt-2 border-t border-app-border flex items-center gap-1.5 text-[10px] text-blue-500 font-medium">
+                           <i class="fa-brands fa-google text-[9px]"></i>
+                           <span class="truncate">${slot.gcalSummary}</span>
                        </div>`
                     : `<div class="mt-2.5 text-[9px] text-gray-400 italic">空き枠アサイン可能</div>`
                 }
@@ -1245,10 +1270,12 @@
         const notionToken  = document.getElementById('input-notion-token').value.trim();
         const notionDbId   = document.getElementById('input-notion-db-id').value.trim();
         const geminiKey    = document.getElementById('input-gemini-key').value.trim();
+        const gcalIcal     = document.getElementById('input-gcal-ical').value.trim();
 
         notionToken ? localStorage.setItem('notion_token',       notionToken) : localStorage.removeItem('notion_token');
         notionDbId  ? localStorage.setItem('notion_database_id', notionDbId)  : localStorage.removeItem('notion_database_id');
         geminiKey   ? localStorage.setItem('gemini_api_key',     geminiKey)   : localStorage.removeItem('gemini_api_key');
+        gcalIcal    ? localStorage.setItem('gcal_ical_url',      gcalIcal)    : localStorage.removeItem('gcal_ical_url');
 
         const bothNotion = notionToken && notionDbId;
         document.getElementById('notion-api-status').className = bothNotion
@@ -1259,6 +1286,60 @@
             ? '設定を保存しました。「Notionと同期」ボタンで同期できます！'
             : '設定を保存しました。');
         renderAIPanel();
+    }
+
+    async function syncGoogleCalendar() {
+        const icalUrl = localStorage.getItem('gcal_ical_url')
+            || document.getElementById('input-gcal-ical').value.trim();
+        if (!icalUrl) {
+            showToast('設定にGoogleカレンダーのiCal URLを入力してください。', false);
+            return;
+        }
+
+        const btn  = document.getElementById('gcal-sync-btn');
+        const icon = document.getElementById('gcal-sync-icon');
+        const text = document.getElementById('gcal-sync-text');
+        btn.disabled = true;
+        icon.className = 'fa-solid fa-spinner fa-spin';
+        text.innerText = '同期中...';
+
+        try {
+            const res = await fetch(`/api/cockpit/gcal?icalUrl=${encodeURIComponent(icalUrl)}`);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || '同期失敗');
+
+            // 取得したイベントをカレンダースロットに反映
+            let matched = 0;
+            for (const slot of calendarSlots) {
+                // スロットの日付文字列（例: "6月21日(土)"）から年月日を取る
+                const slotDateStr = slot.date; // "6月21日(土)" 形式
+                const m = slotDateStr.match(/(\d+)月(\d+)日/);
+                if (!m) continue;
+                const month = m[1].padStart(2, '0');
+                const day   = m[2].padStart(2, '0');
+                const year  = new Date().getFullYear();
+                const slotIso = `${year}-${month}-${day}`;
+
+                const dayEvents = data.events.filter(e => e.date === slotIso);
+                if (dayEvents.length > 0 && !slot.plannedActivity) {
+                    const summary = dayEvents.map(e => e.summary).join(' / ');
+                    slot.activeState = `予定あり`;
+                    slot.gcalSummary = summary;
+                    matched++;
+                    await DB.saveCalendarSlot(slot.id, slot.plannedActivity, slot.activeState);
+                }
+            }
+
+            renderCalendarSlots();
+            updateMetrics();
+            showToast(`Googleカレンダーから ${matched} 件の予定を空き枠に反映しました！`);
+        } catch (e) {
+            showToast(`同期エラー: ${e.message}`, false);
+        } finally {
+            btn.disabled = false;
+            icon.className = 'fa-solid fa-arrows-rotate';
+            text.innerText = 'Googleカレンダーを同期';
+        }
     }
 
     function toggleAddBucketForm() {
@@ -1310,9 +1391,11 @@
         const savedToken  = localStorage.getItem('notion_token');
         const savedDbId   = localStorage.getItem('notion_database_id');
         const savedGemini = localStorage.getItem('gemini_api_key');
+        const savedGcal   = localStorage.getItem('gcal_ical_url');
         if (savedToken)  document.getElementById('input-notion-token').value  = savedToken;
         if (savedDbId)   document.getElementById('input-notion-db-id').value  = savedDbId;
         if (savedGemini) document.getElementById('input-gemini-key').value    = savedGemini;
+        if (savedGcal)   document.getElementById('input-gcal-ical').value     = savedGcal;
         if (savedToken && savedDbId) {
             document.getElementById('notion-api-status').className = 'w-2 h-2 rounded-full bg-emerald-500 pulse-indicator';
         }
