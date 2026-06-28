@@ -1374,20 +1374,18 @@
         renderAIPanel();
     }
 
-    async function syncGoogleCalendar() {
+    async function syncGoogleCalendar(silent = false) {
         const icalUrl = localStorage.getItem('gcal_ical_url')
             || document.getElementById('input-gcal-ical').value.trim();
         if (!icalUrl) {
-            showToast('設定にGoogleカレンダーのiCal URLを入力してください。', false);
+            if (!silent) showToast('設定にGoogleカレンダーのiCal URLを入力してください。', false);
             return;
         }
 
         const btn  = document.getElementById('gcal-sync-btn');
         const icon = document.getElementById('gcal-sync-icon');
         const text = document.getElementById('gcal-sync-text');
-        btn.disabled = true;
-        icon.className = 'fa-solid fa-spinner fa-spin';
-        text.innerText = '同期中...';
+        if (!silent) { btn.disabled = true; icon.className = 'fa-solid fa-spinner fa-spin'; text.innerText = '同期中...'; }
 
         try {
             const res = await fetch(`/api/cockpit/gcal?icalUrl=${encodeURIComponent(icalUrl)}`);
@@ -1412,13 +1410,11 @@
 
             renderCalendarSlots();
             updateMetrics();
-            showToast(`Googleカレンダーから ${matched} 件の予定を空き枠に反映しました！`);
+            if (!silent) showToast(`Googleカレンダーから ${matched} 件の予定を空き枠に反映しました！`);
         } catch (e) {
-            showToast(`同期エラー: ${e.message}`, false);
+            if (!silent) showToast(`同期エラー: ${e.message}`, false);
         } finally {
-            btn.disabled = false;
-            icon.className = 'fa-solid fa-arrows-rotate';
-            text.innerText = 'Googleカレンダーを同期';
+            if (!silent) { btn.disabled = false; icon.className = 'fa-solid fa-arrows-rotate'; text.innerText = 'Googleカレンダーを同期'; }
         }
     }
 
@@ -1495,6 +1491,11 @@
         renderEventsPanel();
         updateMetrics();
         gainXP(0);
+
+        // Googleカレンダー自動同期（URLが保存済みの場合）
+        if (savedGcal) {
+            syncGoogleCalendar(true); // true = サイレントモード
+        }
     };
 
     // ==========================================
