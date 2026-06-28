@@ -1077,10 +1077,10 @@
     // 6. イベントパネル
     // ==========================================
 
-    function renderEventsPanel() {
+    function renderEventCards(events) {
         const container = document.getElementById('event-feed-container');
         container.innerHTML = '';
-        mockEvents.forEach(event => {
+        events.forEach(event => {
             const card = document.createElement('div');
             card.className = 'bg-white border border-app-border rounded-xl p-3.5 text-left interactive-card shadow-subtle space-y-2';
             card.innerHTML = `
@@ -1100,6 +1100,57 @@
             `;
             container.appendChild(card);
         });
+    }
+
+    async function renderEventsPanel() {
+        const container = document.getElementById('event-feed-container');
+        const apiKey = localStorage.getItem('gemini_api_key');
+
+        // Gemini APIキーがない場合はモックをそのまま表示
+        if (!apiKey) {
+            renderEventCards(mockEvents);
+            return;
+        }
+
+        // ローディング表示
+        container.innerHTML = `
+            <div class="space-y-3">
+                <div class="skeleton h-24 w-full rounded-xl"></div>
+                <div class="skeleton h-24 w-full rounded-xl"></div>
+                <div class="skeleton h-24 w-full rounded-xl"></div>
+            </div>`;
+
+        // 直近の土日を取得
+        const upcomingWeekends = calendarSlots.slice(0, 4).map(s => s.date).join('、');
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日`;
+
+        const prompt = `今日は${dateStr}です。東京・首都圏で${upcomingWeekends}の週末に開催される、体験型・非日常系のリアルイベントを4件提案してください。
+アート展、アウトドア体験、グルメ体験、ワークショップなどジャンルを混ぜてください。
+必ず以下のJSON配列のみを返してください（説明文は不要）:
+[
+  {"title":"イベント名","tag":"アート|アウトドア|極上体験|インドア","place":"会場名・エリア","date":"月日(曜) 時刻","desc":"2文程度の説明"}
+]`;
+
+        try {
+            const res = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                }
+            );
+            const data = await res.json();
+            const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const jsonMatch = raw.match(/\[[\s\S]*\]/);
+            if (!jsonMatch) throw new Error('JSON not found');
+            const events = JSON.parse(jsonMatch[0]);
+            renderEventCards(events);
+        } catch (e) {
+            // エラー時はモックにフォールバック
+            renderEventCards(mockEvents);
+        }
     }
 
     // ==========================================
