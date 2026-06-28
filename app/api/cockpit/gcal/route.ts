@@ -101,13 +101,15 @@ export async function GET(request: Request) {
 
   const allEvents = parseICal(icalText)
 
-  // 直近2ヶ月の土日に絞る
+  // 直近2ヶ月のイベントを返す（1日前から取得してタイムゾーンズレを吸収）
   const now = new Date()
+  const from = new Date(now)
+  from.setDate(from.getDate() - 1)
   const twoMonthsLater = new Date(now)
   twoMonthsLater.setMonth(twoMonthsLater.getMonth() + 2)
 
   const weekendEvents = allEvents
-    .filter(e => e.start >= now && e.start <= twoMonthsLater)
+    .filter(e => e.start >= from && e.start <= twoMonthsLater)
     .map(e => ({
       summary: e.summary,
       date: e.start.toISOString().split('T')[0],

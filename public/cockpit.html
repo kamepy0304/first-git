@@ -467,22 +467,42 @@
     // 1. アプリケーション状態
     // ==========================================
 
-    let calendarSlots = [
-        { id: 'slot-6-6',  date: '6月6日 (土)',  activeState: '午前のみ空き',      desc: 'ビジネス予定が入る可能性あり',   isSelected: true,  plannedActivity: null },
-        { id: 'slot-6-7',  date: '6月7日 (日)',  activeState: '終日空きあり',      desc: '終日完全にフリーな1日',          isSelected: false, plannedActivity: null },
-        { id: 'slot-6-13', date: '6月13日 (土)', activeState: '予定あり（キープ）', desc: '夕方から家族との会食',           isSelected: false, plannedActivity: null },
-        { id: 'slot-6-14', date: '6月14日 (日)', activeState: '午後から空き',       desc: '午前中はランニングトレーニング', isSelected: false, plannedActivity: null },
-        { id: 'slot-6-20', date: '6月20日 (土)', activeState: '終日空きあり',      desc: '予定一切なしの空白日',           isSelected: false, plannedActivity: null },
-    ];
+    // 直近2ヶ月の土日を動的生成
+    function generateCalendarSlots() {
+        const slots = [];
+        const now = new Date();
+        const end = new Date(now);
+        end.setMonth(end.getMonth() + 2);
+        const d = new Date(now);
+        // 今日から土日を探して追加
+        while (d <= end) {
+            const day = d.getDay();
+            if (day === 6 || day === 0) {
+                const m = d.getMonth() + 1;
+                const dt = d.getDate();
+                const dayName = day === 6 ? '土' : '日';
+                const id = `slot-${m}-${dt}`;
+                const iso = `${d.getFullYear()}-${String(m).padStart(2,'0')}-${String(dt).padStart(2,'0')}`;
+                slots.push({
+                    id,
+                    date: `${m}月${dt}日 (${dayName})`,
+                    isoDate: iso,
+                    activeState: '終日空きあり',
+                    desc: '空き枠 — バケットリストをアサインしよう',
+                    isSelected: slots.length === 0,
+                    plannedActivity: null,
+                    gcalSummary: null,
+                });
+            }
+            d.setDate(d.getDate() + 1);
+        }
+        return slots;
+    }
 
-    // カレンダースロットの初期 activeState（リセット用）
-    const ORIGINAL_STATES = {
-        'slot-6-6':  '午前のみ空き',
-        'slot-6-7':  '終日空きあり',
-        'slot-6-13': '予定あり（キープ）',
-        'slot-6-14': '午後から空き',
-        'slot-6-20': '終日空きあり',
-    };
+    let calendarSlots = generateCalendarSlots();
+
+    // 初期 activeState（リセット用）
+    const ORIGINAL_STATES = Object.fromEntries(calendarSlots.map(s => [s.id, '終日空きあり']));
 
     const mockEvents = [
         { id: 101, title: '東京・現代アートフェスタ2026',         date: '6月6日(土)〜',      place: '天王洲アイル',           desc: '運河沿いの倉庫街がデジタルアート一色に。五感で感じるデジタルインスタレーション体験。',  tag: 'アート' },
@@ -1311,16 +1331,7 @@
             // 取得したイベントをカレンダースロットに反映
             let matched = 0;
             for (const slot of calendarSlots) {
-                // スロットの日付文字列（例: "6月21日(土)"）から年月日を取る
-                const slotDateStr = slot.date; // "6月21日(土)" 形式
-                const m = slotDateStr.match(/(\d+)月(\d+)日/);
-                if (!m) continue;
-                const month = m[1].padStart(2, '0');
-                const day   = m[2].padStart(2, '0');
-                const year  = new Date().getFullYear();
-                const slotIso = `${year}-${month}-${day}`;
-
-                const dayEvents = data.events.filter(e => e.date === slotIso);
+                const dayEvents = data.events.filter(e => e.date === slot.isoDate);
                 if (dayEvents.length > 0 && !slot.plannedActivity) {
                     const summary = dayEvents.map(e => e.summary).join(' / ');
                     slot.activeState = `予定あり`;
