@@ -1337,7 +1337,11 @@
                 const dayEvents = data.events.filter(e => e.date === slot.isoDate);
                 if (dayEvents.length > 0 && !slot.plannedActivity) {
                     slot.activeState = `予定あり`;
-                    slot.gcalSummary = dayEvents.map(e => e.time ? `${e.time} ${e.summary}` : e.summary);
+                    const timePattern = /^\d{1,2}:\d{2}/;
+                    slot.gcalSummary = dayEvents.map(e => {
+                        if (!e.time || timePattern.test(e.summary)) return e.summary;
+                        return `${e.time} ${e.summary}`;
+                    });
                     matched++;
                     await DB.saveCalendarSlot(slot.id, slot.plannedActivity, slot.activeState);
                 }

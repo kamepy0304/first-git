@@ -115,14 +115,18 @@ export async function GET(request: Request) {
   const weekendEvents = allEvents
     .filter(e => e.start >= from && e.start <= twoMonthsLater)
     .map(e => {
+      // JST (UTC+9) に変換
+      const jst = new Date(e.start.getTime() + 9 * 60 * 60 * 1000)
       const timeStr = e.allDay
         ? null
-        : `${String(e.start.getHours()).padStart(2, '0')}:${String(e.start.getMinutes()).padStart(2, '0')}`
+        : `${String(jst.getUTCHours()).padStart(2, '0')}:${String(jst.getUTCMinutes()).padStart(2, '0')}`
+      // JST日付（日本時間基準）
+      const jstDate = jst.toISOString().split('T')[0]
       return {
         summary: e.summary,
-        date: e.start.toISOString().split('T')[0],
+        date: jstDate,
         time: timeStr,
-        dayOfWeek: e.start.getDay(),
+        dayOfWeek: jst.getUTCDay(),
       }
     })
 
