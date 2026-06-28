@@ -69,27 +69,38 @@
         }
 
         /* ===== 2. SIDEBAR ===== */
+        aside {
+            background: linear-gradient(180deg, #2A2825 0%, #232120 100%) !important;
+            border-right: 1px solid rgba(255,255,255,0.07) !important;
+        }
+        aside h1, aside p, aside span, aside a { color: rgba(255,255,255,0.85) !important; }
+        aside .text-app-textMuted { color: rgba(255,255,255,0.4) !important; }
         .nav-active-item {
-            background: linear-gradient(90deg, rgba(194,125,56,0.11) 0%, rgba(234,232,226,0.5) 100%) !important;
-            border-left: 2.5px solid #C27D38 !important;
-            color: #A86628 !important;
+            background: linear-gradient(90deg, rgba(194,125,56,0.28) 0%, rgba(194,125,56,0.08) 100%) !important;
+            border-left: 3px solid #E09550 !important;
+            color: #F0B070 !important;
             font-weight: 700 !important;
         }
         .nav-base-item {
-            border-left: 2.5px solid transparent;
+            border-left: 3px solid transparent;
             transition: all 0.18s ease;
         }
         .nav-base-item:hover {
-            background: rgba(194,125,56,0.05);
-            border-left-color: rgba(194,125,56,0.3);
+            background: rgba(255,255,255,0.06) !important;
+            border-left-color: rgba(194,125,56,0.5) !important;
         }
         .sidebar-section-label {
             font-size: 9.5px;
             font-weight: 800;
             letter-spacing: 0.13em;
             text-transform: uppercase;
-            color: #A8A5A0;
+            color: rgba(255,255,255,0.3) !important;
         }
+        aside .border-t { border-color: rgba(255,255,255,0.08) !important; }
+        aside .bg-white\/60 { background: rgba(255,255,255,0.04) !important; }
+        aside .text-gray-800 { color: rgba(255,255,255,0.9) !important; }
+        aside .bg-gray-200 { background: rgba(255,255,255,0.12) !important; }
+        aside .bg-app-accent { background: #C27D38 !important; }
 
         /* ===== 3. HEADER ===== */
         header {
@@ -112,6 +123,17 @@
         }
 
         /* ===== 4. CARDS ===== */
+        .card-polished {
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05) !important;
+        }
+        .card-polished:hover {
+            box-shadow: 0 8px 28px rgba(194,125,56,0.14), 0 2px 8px rgba(0,0,0,0.06) !important;
+            transform: translateY(-2px);
+        }
+        /* メトリクスタイルのカラー強化 */
+        #metric-stock { color: #37352F !important; font-size: 1.5rem !important; font-weight: 800 !important; }
+        #metric-assigned { color: #C27D38 !important; font-size: 1.5rem !important; font-weight: 800 !important; }
+        #metric-completed { color: #16A34A !important; font-size: 1.5rem !important; font-weight: 800 !important; }
         .card-polished {
             background: #ffffff;
             border: 1px solid #ECE9E2;
